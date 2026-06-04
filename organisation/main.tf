@@ -2,30 +2,11 @@ resource "aws_organizations_organization" "org" {
   feature_set = "ALL"
 }
 
-module "security_ou" {
-  source = "../modules/ou"
+module "org_units" {
+  source   = "../modules/ou"
+  for_each = var.ou_names
 
-  name      = var.security_ou_name
-  parent_id = aws_organizations_organization.org.roots[0].id
-}
-
-module "infra_ou" {
-  source = "../modules/ou"
-
-  name      = var.infra_ou_name
-  parent_id = aws_organizations_organization.org.roots[0].id
-}
-
-module "sandbox_ou" {
-  source = "../modules/ou"
-
-  name      = var.sandbox_ou_name
-  parent_id = aws_organizations_organization.org.roots[0].id
-}
-
-module "workloads_ou" {
-  source = "../modules/ou"
-
-  name      = var.workloads_ou_name
+  # each.value represents the current string in the loop (e.g. "Security")
+  name      = each.value
   parent_id = aws_organizations_organization.org.roots[0].id
 }

@@ -6,18 +6,14 @@ variable "terraform-profile"{
     type = string
 }
 
-variable "security_ou_name" {
-  type = string
-}
-
-variable "infra_ou_name" {
-  type = string
-}
-
-variable "sandbox_ou_name" {
-  type = string
-}
-
-variable "workloads_ou_name" {
-  type = string
+# Define a single variable that holds all desired OU names
+variable "ou_names" {
+  description = "A set of Organizational Unit names to be created under the root"
+  type        = set(string)
+  default     = [
+    "Security",
+    "Infrastructure",
+    "Sandbox",
+    "Workloads"
+  ]
 }
