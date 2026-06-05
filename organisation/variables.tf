@@ -18,30 +18,10 @@ variable "ou_names" {
   ]
 }
 
-variable "network_account_email" {
-  type = string
-}
-
-variable "shared_services_account_email" {
-  type = string
-}
-
-variable "audit_account_email" {
-  type = string
-}
-
-variable "log_archive_account_email" {
-  type = string
-}
-
-variable "sandbox_account_email" {
-  type = string
-}
-
-variable "dev_account_email" {
-  type = string
-}
-
-variable "prod_account_email" {
-  type = string
+variable "accounts" {
+  description = "A map of accounts to be created, specifying their email and the parent OU name."
+  type = map(object({
+    email   = string
+    ou_name = string
+  }))
 }

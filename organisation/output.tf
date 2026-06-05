@@ -5,30 +5,7 @@ output "ou_ids" {
   value = { for name, ou in module.org_units : name => ou.ou_id }
 }
 
-output "network_account_id" {
-  value = module.network_account.account_id
-}
-
-output "shared_services_account_id" {
-  value = module.shared_services_account.account_id
-}
-
-output "audit_account_id" {
-  value = module.audit_account.account_id
-}
-
-output "log_archive_account_id" {
-  value = module.log_archive_account.account_id
-}
-
-output "sandbox_account_id" {
-  value = module.sandbox_account.account_id
-}
-
-output "dev_account_id" {
-  value = module.dev_account.account_id
-}
-
-output "prod_account_id" {
-  value = module.prod_account.account_id
+output "account_ids" {
+  description = "A map of Account names to their corresponding IDs"
+  value       = { for name, acc in module.accounts : name => acc.account_id }
 }
