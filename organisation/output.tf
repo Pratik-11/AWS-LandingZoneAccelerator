@@ -25,3 +25,8 @@ output "scp_ids" {
     deny_iam_user_creation  = module.scp_deny_iam_user_creation.policy_id
   }
 }
+
+output "org_id" {
+  description = "The AWS Organization ID"
+  value       = aws_organizations_organization.org.id
+}
