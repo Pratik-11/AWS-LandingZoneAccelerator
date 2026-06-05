@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyExpensiveServices",
+      "Effect": "Deny",
+      "Action": [
+        "redshift:CreateCluster",
+        "emr:RunJobFlow",
+        "sagemaker:CreateNotebookInstance",
+        "sagemaker:CreateEndpoint",
+        "es:CreateDomain",
+        "rds:CreateDBInstance"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

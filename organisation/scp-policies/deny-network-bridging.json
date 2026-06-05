@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenySandboxNetworkBridging",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:CreateVpcPeeringConnection",
+        "ec2:CreateTransitGatewayVpcAttachment",
+        "directconnect:*",
+        "ram:AcceptResourceShareInvitation"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

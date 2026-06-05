@@ -25,3 +25,9 @@ variable "accounts" {
     ou_name = string
   }))
 }
+
+variable "allowed_regions" {
+  description = "List of AWS regions that are permitted across the organization"
+  type        = list(string)
+  default     = ["us-east-1"]
+}
