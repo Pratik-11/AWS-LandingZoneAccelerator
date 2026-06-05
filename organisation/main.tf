@@ -1,6 +1,12 @@
 resource "aws_organizations_organization" "org" {
   feature_set          = "ALL"
   enabled_policy_types = ["SERVICE_CONTROL_POLICY"]
+
+  # Enable Trusted Access for CloudTrail and Config
+  aws_service_access_principals = [
+    "cloudtrail.amazonaws.com",
+    "config.amazonaws.com"
+  ]
 }
 
 module "org_units" {
