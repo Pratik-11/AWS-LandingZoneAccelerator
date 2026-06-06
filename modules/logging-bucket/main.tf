@@ -82,7 +82,6 @@ resource "aws_s3_bucket_policy" "this" {
         Resource = "${aws_s3_bucket.this.arn}/AWSLogs/*"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
             "aws:PrincipalOrgID" = var.org_id
           }
         }
