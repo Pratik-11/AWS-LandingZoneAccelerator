@@ -28,6 +28,28 @@ resource "aws_iam_role_policy_attachment" "config_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
 }
 
+resource "aws_iam_role_policy" "config_s3_delivery" {
+  name = "ConfigS3DeliveryPolicy"
+  role = aws_iam_role.config_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetBucketAcl"
+        ]
+        Resource = [
+          var.config_logs_bucket_arn,
+          "${var.config_logs_bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_config_configuration_recorder" "this" {
   name     = "default"
   role_arn = aws_iam_role.config_role.arn
