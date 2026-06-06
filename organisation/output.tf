@@ -30,3 +30,8 @@ output "org_id" {
   description = "The AWS Organization ID"
   value       = aws_organizations_organization.org.id
 }
+
+output "allowed_regions" {
+  description = "List of AWS regions permitted across the organization by SCP"
+  value       = var.allowed_regions
+}
