@@ -30,13 +30,14 @@ data "terraform_remote_state" "logging" {
 # ──────────────────────────────────────────────
 
 locals {
-  account_ids        = data.terraform_remote_state.org.outputs.account_ids
-  config_bucket_id   = data.terraform_remote_state.logging.outputs.config_bucket_id
-  config_bucket_arn  = data.terraform_remote_state.logging.outputs.config_bucket_arn  
+  account_ids      = data.terraform_remote_state.org.outputs.account_ids
+  allowed_regions  = data.terraform_remote_state.org.outputs.allowed_regions
+  config_bucket_id = data.terraform_remote_state.logging.outputs.config_bucket_id
+  config_bucket_arn = data.terraform_remote_state.logging.outputs.config_bucket_arn
 }
 
 # ──────────────────────────────────────────────
-# Default Provider (Management Account)
+# Default Provider (Management Account, primary region)
 # ──────────────────────────────────────────────
 
 provider "aws" {
@@ -45,12 +46,12 @@ provider "aws" {
 }
 
 # ──────────────────────────────────────────────
-# Provider Aliases for Each Member Account
+# us-east-1 Provider Aliases (already existing, one per account)
 # ──────────────────────────────────────────────
 
 provider "aws" {
-  alias   = "dev"
-  region  = var.aws_region
+  alias   = "dev_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
@@ -58,8 +59,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "prod"
-  region  = var.aws_region
+  alias   = "prod_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
@@ -67,8 +68,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "audit"
-  region  = var.aws_region
+  alias   = "audit_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
@@ -76,8 +77,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "log_archive"
-  region  = var.aws_region
+  alias   = "log_archive_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
@@ -85,8 +86,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "network"
-  region  = var.aws_region
+  alias   = "network_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
@@ -94,8 +95,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "shared_services"
-  region  = var.aws_region
+  alias   = "shared_services_use1"
+  region  = "us-east-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
@@ -103,8 +104,75 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "sandbox"
-  region  = var.aws_region
+  alias   = "sandbox_use1"
+  region  = "us-east-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+# ──────────────────────────────────────────────
+# ap-south-1 Provider Aliases (NEW, one per account)
+# ──────────────────────────────────────────────
+
+provider "aws" {
+  alias   = "dev_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "prod_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "audit_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "log_archive_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "network_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "shared_services_aps1"
+  region  = "ap-south-1"
+  profile = var.terraform-profile
+  assume_role {
+    role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
+  }
+}
+
+provider "aws" {
+  alias   = "sandbox_aps1"
+  region  = "ap-south-1"
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"

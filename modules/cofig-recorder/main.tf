@@ -7,6 +7,18 @@ terraform {
   }
 }
 
+variable "existing_role_arn" {
+  description = "ARN of an existing Config role to use when create_iam_role is false"
+  type        = string
+  default     = ""
+}
+
+locals {
+  config_role_arn = var.create_iam_role ? aws_iam_role.config_role[0].arn : var.existing_role_arn
+}
+
+
+
 data "aws_iam_policy_document" "config_assume_role" {
   statement {
     effect = "Allow"
@@ -19,18 +31,21 @@ data "aws_iam_policy_document" "config_assume_role" {
 }
 
 resource "aws_iam_role" "config_role" {
+  count              = var.create_iam_role ? 1 : 0
   name               = "AWSConfigRecorderRole"
   assume_role_policy = data.aws_iam_policy_document.config_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "config_policy" {
-  role       = aws_iam_role.config_role.name
+  count      = var.create_iam_role ? 1 : 0
+  role       = aws_iam_role.config_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
 }
 
 resource "aws_iam_role_policy" "config_s3_delivery" {
-  name = "ConfigS3DeliveryPolicy"
-  role = aws_iam_role.config_role.id
+  count = var.create_iam_role ? 1 : 0
+  name  = "ConfigS3DeliveryPolicy"
+  role  = aws_iam_role.config_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -52,7 +67,7 @@ resource "aws_iam_role_policy" "config_s3_delivery" {
 
 resource "aws_config_configuration_recorder" "this" {
   name     = "default"
-  role_arn = aws_iam_role.config_role.arn
+  role_arn = local.config_role_arn
   recording_group {
     all_supported                 = true
     include_global_resource_types = true
