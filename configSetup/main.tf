@@ -139,34 +139,6 @@ module "config_recorder_sandbox_aps1" {
 # This creates a single aggregator that pulls Config data
 # from ALL accounts in the Organization into one view.
 
-resource "aws_config_configuration_aggregator" "org_aggregator" {
-  name = "organization-aggregator"
-
-  organization_aggregation_source {
-    all_regions = true
-    role_arn    = aws_iam_role.config_aggregator_role.arn
-  }
-
-  depends_on = [
-    # us-east-1
-    module.config_recorder_dev_use1,
-    module.config_recorder_prod_use1,
-    module.config_recorder_audit_use1,
-    module.config_recorder_log_archive_use1,
-    module.config_recorder_network_use1,
-    module.config_recorder_shared_services_use1,
-    module.config_recorder_sandbox_use1,
-
-    # ap-south-1
-    module.config_recorder_dev_aps1,
-    module.config_recorder_prod_aps1,
-    module.config_recorder_audit_aps1,
-    module.config_recorder_log_archive_aps1,
-    module.config_recorder_network_aps1,
-    module.config_recorder_shared_services_aps1,
-    module.config_recorder_sandbox_aps1
-  ]
-}
 
 # IAM Role for the Config Aggregator
 data "aws_iam_policy_document" "aggregator_assume" {
@@ -189,3 +161,19 @@ resource "aws_iam_role_policy_attachment" "aggregator_policy" {
   role       = aws_iam_role.config_aggregator_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations"
 }
+
+
+resource "aws_config_configuration_aggregator" "org_aggregator" {
+  name = "organization-aggregator"
+
+  organization_aggregation_source {
+    all_regions = true
+    role_arn    = aws_iam_role.config_aggregator_role.arn
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.aggregator_policy
+  ]
+}
+
+
