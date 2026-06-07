@@ -141,39 +141,40 @@ module "config_recorder_sandbox_aps1" {
 
 
 # IAM Role for the Config Aggregator
-data "aws_iam_policy_document" "aggregator_assume" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["config.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "config_aggregator_role" {
-  name               = "AWSConfigAggregatorRole"
-  assume_role_policy = data.aws_iam_policy_document.aggregator_assume.json
-}
-
-resource "aws_iam_role_policy_attachment" "aggregator_policy" {
-  role       = aws_iam_role.config_aggregator_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations"
-}
-
-
-resource "aws_config_configuration_aggregator" "org_aggregator" {
-  name = "organization-aggregator"
-
-  organization_aggregation_source {
-    all_regions = true
-    role_arn    = aws_iam_role.config_aggregator_role.arn
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.aggregator_policy
-  ]
-}
-
-
+#data "aws_iam_policy_document" "aggregator_assume" {
+#  statement {
+#    effect = "Allow"
+#    principals {
+#      type        = "Service"
+#      identifiers = ["config.amazonaws.com"]
+#    }
+#    actions = ["sts:AssumeRole"]
+#  }
+#}
+#
+#resource "aws_iam_role" "config_aggregator_role" {
+#  name               = "AWSConfigAggregatorRole"
+#  assume_role_policy = data.aws_iam_policy_document.aggregator_assume.json
+#}
+#
+#resource "aws_iam_role_policy_attachment" "aggregator_policy" {
+#  role       = aws_iam_role.config_aggregator_role.name
+#  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations"
+#}
+#
+#
+#resource "aws_config_configuration_aggregator" "org_aggregator" {
+#  name = "organization-aggregator"
+#
+#  organization_aggregation_source {
+#    all_regions = true
+#    role_arn    = aws_iam_role.config_aggregator_role.arn
+#  }
+#
+#  depends_on = [
+#    aws_iam_role_policy_attachment.aggregator_policy
+#  ]
+#}
+#
+#
+#
