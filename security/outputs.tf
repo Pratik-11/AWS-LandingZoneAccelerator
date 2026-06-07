@@ -64,3 +64,17 @@ output "securityhub_global_aggregator_arn" {
   description = "The ARN of the Cross-Region Finding Aggregator in the Audit account"
   value       = aws_securityhub_finding_aggregator.global_aggregator.id
 }
+
+# ──────────────────────────────────────────────
+# IAM Access Analyzer Outputs
+# ──────────────────────────────────────────────
+
+output "access_analyzer_use1_arn" {
+  description = "The ARN of the Access Analyzer in us-east-1"
+  value       = module.access_analyzer_use1.analyzer_arn
+}
+
+output "access_analyzer_aps1_arn" {
+  description = "The ARN of the Access Analyzer in ap-south-1"
+  value       = module.access_analyzer_aps1.analyzer_arn
+}

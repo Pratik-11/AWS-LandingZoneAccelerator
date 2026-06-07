@@ -63,26 +63,79 @@ resource "aws_securityhub_finding_aggregator" "global_aggregator" {
 }
 
 
-#
-#module "inspector" {
-#  source           = "../modules/security-inspector"
-#  audit_account_id = local.audit_account_id
-#  all_account_ids  = local.all_account_ids
-#  providers = {
-#    aws       = aws
-#    aws.audit = aws.audit
-#  }
-#}
-#
-#module "access_analyzer" {
-#  source           = "../modules/security-access-analyzer"
-#  audit_account_id = local.audit_account_id
-#  providers = {
-#    aws       = aws
-#    aws.audit = aws.audit
-#  }
-#}
-#
+# ──────────────────────────────────────────────
+# IAM Access Analyzer Delegation (Global)
+# ──────────────────────────────────────────────
+
+resource "aws_iam_service_linked_role" "access_analyzer" {
+  aws_service_name = "access-analyzer.amazonaws.com"
+}
+
+resource "aws_organizations_delegated_administrator" "analyzer_admin" {
+  account_id        = local.audit_account_id
+  service_principal = "access-analyzer.amazonaws.com"
+}
+
+
+# ──────────────────────────────────────────────
+# IAM Access Analyzer Deployment (Multi-Region)
+# ──────────────────────────────────────────────
+
+module "access_analyzer_use1" {
+  source           = "../modules/security-access-analyzer"
+  audit_account_id = local.audit_account_id
+  
+  providers = {
+    aws.audit = aws.audit_use1
+  }
+
+  depends_on = [
+    aws_organizations_delegated_administrator.analyzer_admin,
+    aws_iam_service_linked_role.access_analyzer
+  ]
+}
+
+module "access_analyzer_aps1" {
+  source           = "../modules/security-access-analyzer"
+  audit_account_id = local.audit_account_id
+  
+  providers = {
+    aws.audit = aws.audit_aps1
+  }
+
+  depends_on = [
+    aws_organizations_delegated_administrator.analyzer_admin,
+    aws_iam_service_linked_role.access_analyzer
+  ]
+}
+
+# ──────────────────────────────────────────────
+# Amazon Inspector Deployment (Multi-Region)
+# ──────────────────────────────────────────────
+
+module "inspector_use1" {
+  source           = "../modules/security-inspector"
+  audit_account_id = local.audit_account_id
+  all_account_ids  = local.all_account_ids
+  
+  providers = {
+    aws.management = aws.management_use1
+    aws.audit      = aws.audit_use1
+  }
+}
+
+module "inspector_aps1" {
+  source           = "../modules/security-inspector"
+  audit_account_id = local.audit_account_id
+  all_account_ids  = local.all_account_ids
+  
+  providers = {
+    aws.management = aws.management_aps1
+    aws.audit      = aws.audit_aps1
+  }
+}
+
+
 #module "alerts" {
 #  source      = "../modules/security-alerts"
 #  alert_email = var.alert_email
