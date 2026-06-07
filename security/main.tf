@@ -135,12 +135,15 @@ module "inspector_aps1" {
   }
 }
 
+# ──────────────────────────────────────────────
+# Security Alerting (SNS & EventBridge)
+# ──────────────────────────────────────────────
 
-#module "alerts" {
-#  source      = "../modules/security-alerts"
-#  alert_email = var.alert_email
-#  providers = {
-#    aws       = aws
-#    aws.audit = aws.audit
-#  }
-#}
+module "alerts" {
+  source      = "../modules/security-alerts"
+  alert_email = var.alert_email
+  
+  providers = {
+    aws.audit = aws.audit_use1
+  }
+}
