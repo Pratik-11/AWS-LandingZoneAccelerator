@@ -51,7 +51,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "dev_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
@@ -60,7 +60,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "prod_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
@@ -69,7 +69,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "audit_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
@@ -78,7 +78,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "log_archive_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
@@ -87,7 +87,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "network_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
@@ -96,7 +96,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "shared_services_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
@@ -105,7 +105,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "sandbox_use1"
-  region  = "us-east-1"
+  region  = local.allowed_regions[0]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"
@@ -118,7 +118,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "dev_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
@@ -127,7 +127,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "prod_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
@@ -136,7 +136,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "audit_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
@@ -145,7 +145,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "log_archive_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
@@ -154,7 +154,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "network_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
@@ -163,7 +163,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "shared_services_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
@@ -172,7 +172,7 @@ provider "aws" {
 
 provider "aws" {
   alias   = "sandbox_aps1"
-  region  = "ap-south-1"
+  region  = local.allowed_regions[1]
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"
