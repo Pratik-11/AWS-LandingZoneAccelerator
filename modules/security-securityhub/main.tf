@@ -32,7 +32,7 @@ resource "aws_securityhub_account" "audit" {
 # STEP 4: Audit Account auto-enables for all members in this region
 resource "aws_securityhub_organization_configuration" "audit_org_config" {
   provider    = aws.audit
-  auto_enable = true
+  auto_enable = false
 
   depends_on = [
     aws_securityhub_organization_admin_account.audit_admin,
