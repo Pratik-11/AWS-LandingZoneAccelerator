@@ -13,6 +13,10 @@ resource "aws_organizations_organization" "org" {
   ]
 }
 
+resource "aws_ram_sharing_with_organization" "org_sharing" {
+  provider = aws
+}
+
 module "org_units" {
   source   = "../modules/ou"
   for_each = var.ou_names
