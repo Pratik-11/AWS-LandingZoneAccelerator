@@ -93,7 +93,7 @@ landing-zone/
 
 Correct Order of setting up this LandingZone from scratch : 
 
-> Organisation  >  logging  >  configSetup  > 
+> organisation  >  logging  >  configSetup  >  security  > networking  >  identity
 
 So, we are supposed to go inside each directory and do terraform init, plan and apply one by one for LANDING ZONE SETUP USING THIS TERRA_CODE_DIRECTORY
 
@@ -205,19 +205,69 @@ Since in this PHASE 4 : I am destroying my management account config aggregator 
 ### Phase 5: Networking
 **Goal:** Centralized network architecture with account-level VPC isolation.
 
-| Task | Module/Location | Status |
-|:-----|:----------------|:-------|
-| Create `networking/` root module | `networking/main.tf` | TODO |
-| Create `modules/vpc/` — reusable VPC module (public/private subnets, NAT, IGW) | `modules/vpc/` | TODO |
-| Create Transit Gateway in Network account | `networking/transit-gateway.tf` | TODO |
-| Create shared VPC in Network account | `networking/main.tf` | TODO |
-| Create VPCs in Dev and Prod accounts, attach to Transit Gateway | `networking/workload-vpcs.tf` | TODO |
-| Create VPC in Sandbox account (isolated, no TGW attachment) | `networking/sandbox-vpc.tf` | TODO |
-| Set up Route53 Private Hosted Zones (optional) | `networking/dns.tf` | TODO |
+see theory docs to understand networking architecture, tasks below are not in order
 
-**Cross-account setup required:** Transit Gateway sharing via RAM (Resource Access Manager), VPC creation in each workload account.
+### Networking Tasks
 
-**Deliverable:** All accounts have networking, centrally managed, with controlled connectivity.
+| Sno. | Task                                                                                    | Module/Location                       | Status |
+| ---- | --------------------------------------------------------------------------------------- | ------------------------------------- | ------ |
+| 1    | Create networking root module                                                           | networking/main.tf                    | done ✅  |
+| 2    | Create modules/vpc/ — reusable VPC module (public/private subnets, NAT, IGW, flow logs[optional]) | modules/vpc/                | done ✅   |
+| 3    | Create Transit Gateway in Network account                                               | networking/transit-gateway.tf         | done ✅   |
+| 4    | Create TGW route table — routes for all spoke  CIDRs [create after all VPC creation - dependency]                                     | networking/transit-gateway-RT.tf           | done ✅   |
+| 5    | Create Network VPC in Network account with public + private subnets                     | networking/network-vpc.tf             | done ✅   |
+| 6    | Share Transit Gateway org-wide via AWS RAM                                              | networking/ram.tf                     | done ✅   |
+| 7    | Create VPC in Dev account, attach to Transit Gateway                                    | networking/workload-vpcs.tf           | done ✅   |
+| 8    | Create VPC in Prod account (private subnets only), attach to Transit Gateway            | networking/workload-vpcs.tf           | done ✅   |
+| 9    | Create VPC in Shared Services account, attach to Transit Gateway                        | networking/workload-vpcs.tf           | done ✅   |
+| 10   | Create VPC in Sandbox account — isolated, no TGW attachment                             | networking/sandbox-vpc.tf             | done ✅   |
+| 11   | TGW Route tables -> association, propagation and routing rules                          | networking/transit-gateway-RT.tf             | done ✅   |
+| 12   | Create Route53 Private Hosted Zones in Network account                                  | networking/dns.tf                     | done ✅   |
+| 13   | Associate PHZs with Dev, Prod, Shared Services VPCs                                     | networking/dns.tf                     | done ✅   |
+| 14   | Enable Route53 Resolver Query Logs — central DNS logging  [deferred for this iteration]                               | networking/dns-query-logs.tf          | TODO   |
+| 15   | Create Network Access Analyzer scope — org-wide network visibility     [deferred for this iteration]                     | networking/network-access-analyzer.tf | TODO   |
+
+
+
+```bash
+sharedService VPC and association with TGW  : deferred this until there is no usecase of sharedServices
+
+refer to doc : .skills/learning/sharedService-networkinSetup.md
+
+```
+
+> Implement a org wide or securityOU specific scp : 
+1. deny creation of VPC by users, only allowed to terraform user : identity based policy something
+
+```
+Optional — future phase (not in current task list):
+
+1. Inspection VPC in Network account for centralized east-west and north-south traffic inspection
+2. AWS Network Firewall — domain, IP, country, and protocol filtering
+
+```
+
+
+### Cross-Account Setup Required
+
+TGW sharing via RAM (accepted in each spoke account), PHZ associations from Network account into workload account VPCs, VPC Flow Logs to central S3 bucket in Log Archive account.
+
+#### VPC CIDR allocation:
+
+
+| Account         | VPC CIDR                                  |
+| --------------- | ----------------------------------------- |
+| Network         | 10.0.0.0/16                               |
+| Dev             | 10.1.0.0/16                               |
+| Prod            | 10.2.0.0/16                               |
+| Shared Services | 10.3.0.0/16                               |
+| Sandbox         | 10.9.0.0/16 — isolated, no overlap needed |
+
+
+
+### Deliverable: 
+
+All accounts have non-overlapping VPCs. Dev, Prod, and Shared Services route through the Transit Gateway. Sandbox is fully isolated. Private DNS resolves consistently across all connected accounts. All DNS queries logged centrally. Network Access Analyzer provides continuous visibility into unintended internet exposure.
 
 ---
 
@@ -226,32 +276,39 @@ Since in this PHASE 4 : I am destroying my management account config aggregator 
 
 | Task | Module/Location | Status |
 |:-----|:----------------|:-------|
-| Create `identity/` root module | `identity/main.tf` | TODO |
-| Enable IAM Identity Center (SSO) in management account | `identity/sso.tf` | TODO |
-| Create Permission Sets (AdministratorAccess, ReadOnly, DeveloperAccess) | `identity/permission-sets.tf` | TODO |
-| Create Groups and assign Permission Sets to accounts | `identity/assignments.tf` | TODO |
-| Create IAM baseline roles in each account (for cross-account Terraform execution) | `modules/iam-baseline/` | TODO |
+| Create `identity/` root module | `identity/main.tf` | done ✅ |
+| Enable IAM Identity Center (SSO) in management account | `identity/sso.tf` | done ✅ |
+| Create Permission Sets (AdministratorAccess, ReadOnly, DeveloperAccess) | `identity/permission-sets.tf` | done ✅ |
+| Create Groups and assign Permission Sets to accounts | `identity/assignments.tf` | done ✅ |
+| Create IAM baseline roles in each account (for cross-account Terraform execution) | `modules/iam-baseline/` | done ✅ |
 
 **Deliverable:** Humans access accounts via SSO. Terraform accesses accounts via assume-role chains.
 
+
+scps specific to this  : 
+1. Identity Center users - email verification - necessary
+2. donot let user access sso portal until they setup MFA
+
+
+// NOT PREFERRED PRACITSE TO SEND CREDS LIKE THIS : refer to docs .skills/bugs/identity-loose-user-creds.md
+
+### ⚠️ IMPORTANT: Billing Console Access Quirk
+Even if a user is assigned a permission set with full Billing/Cost Explorer IAM permissions (like `FAWSReadOnlyBillingAccesss`), **AWS strictly blocks all IAM users and SSO roles from viewing the Billing Console by default.**
+
+AWS requires you to globally explicitly "unlock" the billing console for IAM/SSO users at the account level. Until this is unlocked, AWS completely ignores our Terraform billing policies, and the user will see a red `"You need permissions"` error.
+
+**How to fix it (One-Time Manual Step):**
+This cannot be automated via Terraform. It must be done in the console.
+1. Log into the AWS Console using Administrator credentials (or the Root User of the Management Account).
+2. Click your account name in the top-right corner of the console and select **Account** from the dropdown menu.
+3. Scroll down the page until you find the section named **IAM User and Role Access to Billing Information**.
+4. Click **Edit** next to it.
+5. Check the box to **Activate IAM Access**.
+6. Click **Update**.
+
+Once activated, AWS will immediately start respecting the IAM policies we created via Terraform!
 ---
 
-### Phase 7: Workload Account Baseline
-**Goal:** Every member account gets a consistent security and operational baseline.
-
-| Task | Module/Location | Status |
-|:-----|:----------------|:-------|
-| Create `modules/account-baseline/` composite module | `modules/account-baseline/` | TODO |
-| Apply Config Recorder | included from Phase 3 | TODO |
-| Apply IAM baseline roles | included from Phase 6 | TODO |
-| Apply VPC | included from Phase 5 | TODO |
-| Apply password policy | `modules/account-baseline/` | TODO |
-| Enable EBS default encryption | `modules/account-baseline/` | TODO |
-| Enable S3 account-level public access block | `modules/account-baseline/` | TODO |
-
-**Deliverable:** Every account is hardened and consistent from the moment it's created.
-
----
 
 ## Phase Dependency Graph
 
@@ -268,10 +325,9 @@ Phase 5: Networking ────────────┤ (needs Phase 1)   �
                                 │                   ││
 Phase 6: Identity ──────────────┤ (needs Phase 1)   ││
                                 │                   ││
-Phase 7: Account Baseline ──────┘ (needs 3,5,6)     ││
 ```
 
-Phases 2 through 6 can be developed in parallel after Phase 1 is complete. Phase 7 is a composite that ties everything together.
+Phases 2 through 6 can be developed in parallel after Phase 1 is complete. 
 
 ---
 
@@ -295,18 +351,3 @@ provider "aws" {
 AWS automatically creates an `OrganizationAccountAccessRole` in every member account created via Organizations. This role trusts the management account. Your Terraform running as `terraform-admin-new` in the management account can assume this role to provision resources in any member account.
 
 ---
-
-
-
-## VALIDATING ORGANISATION SETUP 
-
-1. Organisation Enabling and OU Structure
-2. Account Creation
-3. scp-enforcement validations
-4. logging validations
-5. config-recording and aggregation validations
-6. securityhub -> configuration policies, standards, controls, CSPM dashboard
-7. accessAnalyzer -> confirm creation status from creating to enabled
-8. Inspector -> confirm it works or not
-9. Alerting System -> email for HIGH and CRITICAL security findings
-
