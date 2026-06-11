@@ -5,45 +5,45 @@ locals {
   # ────────────────────────────────────────────────────────────────────────────
   account_assignments = {
 
-    # ── PlatformEngineers → AdministratorAccess → ALL accounts ──────────────
-    "platform-admin-management"    = {
+    # ── PlatformEngineers → PowerUserAccess → ALL accounts ──────────────
+    "platform-power-management"    = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.management_account_id
     }
-    "platform-admin-audit" = {
+    "platform-power-audit" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.audit_account_id
     }
-    "platform-admin-logarchive" = {
+    "platform-power-logarchive" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.log_archive_account_id
     }
-    "platform-admin-network" = {
+    "platform-power-network" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.network_account_id
     }
-    "platform-admin-sharedsvc" = {
+    "platform-power-sharedsvc" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.shared_services_account_id
     }
-    "platform-admin-dev" = {
+    "platform-power-dev" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.dev_account_id
     }
-    "platform-admin-prod" = {
+    "platform-power-prod" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.prod_account_id
     }
-    "platform-admin-sandbox" = {
+    "platform-power-sandbox" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
-      ps_arn   = aws_ssoadmin_permission_set.admin.arn
+      ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.sandbox_account_id
     }
 

@@ -11,7 +11,7 @@ output "identity_store_id" {
 output "permission_set_arns" {
   description = "Map of permission set names to their ARNs"
   value = {
-    admin          = aws_ssoadmin_permission_set.admin.arn
+    power         = aws_ssoadmin_permission_set.power.arn
     read_only      = aws_ssoadmin_permission_set.read_only.arn
     developer      = aws_ssoadmin_permission_set.developer.arn
     security_audit = aws_ssoadmin_permission_set.security_audit.arn

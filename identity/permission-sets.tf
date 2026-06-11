@@ -1,18 +1,18 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# AdministratorAccess
+# PowerUserAccess (Platform Engineers)
 # ══════════════════════════════════════════════════════════════════════════════
-resource "aws_ssoadmin_permission_set" "admin" {
-  name             = "AdministratorAccess"
-  description      = "Full administrative access - platform engineers"
+resource "aws_ssoadmin_permission_set" "power" {
+  name             = "PowerUserAccess"
+  description      = "Power user access - platform engineers"
   instance_arn     = local.sso_instance_arn
   session_duration = "PT1H"
   tags             = var.tags
 }
 
-resource "aws_ssoadmin_managed_policy_attachment" "admin" {
+resource "aws_ssoadmin_managed_policy_attachment" "power" {
   instance_arn       = local.sso_instance_arn
-  permission_set_arn = aws_ssoadmin_permission_set.admin.arn
-  managed_policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  permission_set_arn = aws_ssoadmin_permission_set.power.arn
+  managed_policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -33,7 +33,7 @@ resource "aws_ssoadmin_managed_policy_attachment" "read_only" {
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DeveloperAccess (custom inline policy)
+# DeveloperAccess (custom policy created)
 # ══════════════════════════════════════════════════════════════════════════════
 resource "aws_ssoadmin_permission_set" "developer" {
   name             = "DeveloperAccess"
@@ -54,79 +54,46 @@ resource "aws_ssoadmin_permission_set_inline_policy" "developer" {
         Sid    = "ComputeAccess"
         Effect = "Allow"
         Action = [
-          "ec2:*",
-          "ecs:*",
-          "eks:Describe*",
-          "eks:List*",
-          "lambda:*",
-          "autoscaling:*"
+          "ec2:*", "ecs:*", "eks:Describe*", "eks:List*", "lambda:*", "autoscaling:*"
         ]
         Resource = "*"
       },
       {
         Sid    = "StorageAccess"
         Effect = "Allow"
-        Action = [
-          "s3:*",
-          "rds:*",
-          "dynamodb:*",
-          "elasticache:*"
-        ]
+        Action = ["s3:*", "rds:*", "dynamodb:*", "elasticache:*"]
         Resource = "*"
       },
       {
         Sid    = "ObservabilityAccess"
         Effect = "Allow"
-        Action = [
-          "cloudwatch:*",
-          "logs:*",
-          "xray:*",
-          "cloudformation:*"
-        ]
+        Action = ["cloudwatch:*", "logs:*", "xray:*", "cloudformation:*"]
         Resource = "*"
       },
       {
         Sid    = "MessagingAccess"
         Effect = "Allow"
-        Action = [
-          "sns:*",
-          "sqs:*",
-          "events:*"
-        ]
+        Action = ["sns:*", "sqs:*", "events:*"]
         Resource = "*"
       },
       {
         Sid    = "DenyIAMWrite"
         Effect = "Deny"
         Action = [
-          "iam:Create*",
-          "iam:Delete*",
-          "iam:Attach*",
-          "iam:Detach*",
-          "iam:Put*",
-          "iam:Update*",
-          "iam:AddRoleToInstanceProfile",
-          "iam:RemoveRoleFromInstanceProfile"
+          "iam:Create*", "iam:Delete*", "iam:Attach*", "iam:Detach*", "iam:Put*", "iam:Update*", "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile"
         ]
         Resource = "*"
       },
       {
         Sid    = "DenyBilling"
         Effect = "Deny"
-        Action = [
-          "aws-portal:*",
-          "budgets:*",
-          "ce:*",
-          "cur:*"
-        ]
+        Action = ["aws-portal:*", "budgets:*", "ce:*", "cur:*", "billing:*"]
         Resource = "*"
       },
       {
         Sid    = "DenyOrganizationActions"
         Effect = "Deny"
-        Action = [
-          "organizations:*"
-        ]
+        Action = ["organizations:*"]
         Resource = "*"
       }
     ]
@@ -171,5 +138,5 @@ resource "aws_ssoadmin_permission_set" "billing" {
 resource "aws_ssoadmin_managed_policy_attachment" "billing" {
   instance_arn       = local.sso_instance_arn
   permission_set_arn = aws_ssoadmin_permission_set.billing.arn
-  managed_policy_arn = "arn:aws:iam::aws:policy/job-function/Billing"
+  managed_policy_arn = "arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess"
 }
