@@ -5,6 +5,8 @@
 # on first-time setup. Imported into state post-console-setup.
 # ──────────────────────────────────────────────────────────────────
 
+data "aws_organizations_organization" "current" {}
+
 # The Central Configuration policy applied to the org Root.
 # Enables Security Hub + AWS Foundational Security Best Practices v1.0.0
 # across all accounts in the organization.
@@ -27,6 +29,6 @@ resource "aws_securityhub_configuration_policy" "org_policy" {
 # so it applies to all OUs and all accounts.
 resource "aws_securityhub_configuration_policy_association" "root" {
   provider  = aws.audit_use1
-  target_id = "r-kinq"  
+  target_id = data.aws_organizations_organization.current.roots[0].id
   policy_id = aws_securityhub_configuration_policy.org_policy.id
 }
