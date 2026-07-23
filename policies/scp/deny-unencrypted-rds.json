@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyUnencryptedRDS",
+      "Effect": "Deny",
+      "Action": [
+        "rds:CreateDBInstance",
+        "rds:RestoreDBInstanceFromDBSnapshot",
+        "rds:RestoreDBInstanceToPointInTime"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "rds:StorageEncrypted": "false"
+        }
+      }
+    }
+  ]
+}
