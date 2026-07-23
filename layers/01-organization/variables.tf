@@ -26,8 +26,11 @@ variable "accounts" {
   }))
 }
 
-variable "allowed_regions" {
-  description = "List of AWS regions that are permitted across the organization"
-  type        = list(string)
-  default     = ["us-east-1"]
+variable "regions" {
+  description = "Map of primary and secondary regions"
+  type        = map(string)
+  default = {
+    primary   = "us-east-1"
+    secondary = "ap-south-1"
+  }
 }

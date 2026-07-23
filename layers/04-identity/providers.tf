@@ -7,7 +7,7 @@ terraform {
 
 data "terraform_remote_state" "org" {
   backend = "local"
-  config  = { path = "../organisation/terraform.tfstate" }
+  config  = { path = "../../layers/01-organization/terraform.tfstate" }
 }
 
 locals {

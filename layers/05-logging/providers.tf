@@ -17,7 +17,7 @@ provider "aws" {
 data "terraform_remote_state" "org" {
   backend = "local"
   config = {
-    path = "../organisation/terraform.tfstate"
+    path = "../../layers/01-organization/terraform.tfstate"
   }
 }
 

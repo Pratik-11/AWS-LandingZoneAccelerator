@@ -1,6 +1,6 @@
 # 1. Create the CloudTrail Bucket IN THE LOG ARCHIVE ACCOUNT
 module "cloudtrail_bucket" {
-  source = "../modules/logging-bucket"
+  source = "../../modules/logging-bucket"
   
   # Tell Terraform to use the log_archive provider for this module
   providers = {
@@ -14,7 +14,7 @@ module "cloudtrail_bucket" {
 
 # 2. Create the Config Bucket IN THE LOG ARCHIVE ACCOUNT
 module "config_bucket" {
-  source = "../modules/logging-bucket"
+  source = "../../modules/logging-bucket"
 
   providers = {
     aws = aws.log_archive

@@ -2,7 +2,7 @@
 # DEV VPC (us-east-1)
 # ──────────────────────────────────────────────
 module "dev_vpc_use1" {
-  source          = "../modules/vpc"
+  source = "../../modules/vpc"
   providers       = { aws = aws.dev_use1 }
   cidr            = "10.1.0.0/16"
   public_subnets  = ["10.1.1.0/24", "10.1.2.0/24"]
@@ -31,7 +31,7 @@ resource "aws_route" "dev_use1_to_org" {
 # PROD VPC (us-east-1) - NO PUBLIC INTERNET
 # ──────────────────────────────────────────────
 module "prod_vpc_use1" {
-  source                = "../modules/vpc"
+  source = "../../modules/vpc"
   providers             = { aws = aws.prod_use1 }
   cidr                  = "10.2.0.0/16"
   private_subnets       = ["10.2.11.0/24", "10.2.12.0/24"]
@@ -63,7 +63,7 @@ resource "aws_route" "prod_use1_to_tgw" {
 #----------------------------------------------------------
 
 module "dev_vpc_aps1" {
-  source          = "../modules/vpc"
+  source = "../../modules/vpc"
   providers       = { aws = aws.dev_aps1 }
   cidr            = "10.11.0.0/16"
   public_subnets  = ["10.11.1.0/24", "10.11.2.0/24"]
@@ -91,7 +91,7 @@ resource "aws_route" "dev_aps1_to_org" {
 #----------------------------------------------------------
 
 module "prod_vpc_aps1" {
-  source                = "../modules/vpc"
+  source = "../../modules/vpc"
   providers             = { aws = aws.prod_aps1 }
   cidr                  = "10.12.0.0/16"
   private_subnets       = ["10.12.11.0/24", "10.12.12.0/24"]
@@ -132,7 +132,7 @@ resource "aws_route" "prod_aps1_to_tgw" {
 #----------------------------------------------------------
 
 module "shared_vpc_use1" {
-  source          = "../modules/vpc"
+  source = "../../modules/vpc"
   providers       = { aws = aws.shared_use1 }
   cidr            = "10.3.0.0/16"
   public_subnets  = ["10.3.1.0/24", "10.3.2.0/24"]
@@ -160,7 +160,7 @@ resource "aws_route" "shared_use1_to_org" {
 #----------------------------------------------------------
 
 module "shared_vpc_aps1" {
-  source          = "../modules/vpc"
+  source = "../../modules/vpc"
   providers       = { aws = aws.shared_aps1 }
   cidr            = "10.13.0.0/16"
   public_subnets  = ["10.13.1.0/24", "10.13.2.0/24"]

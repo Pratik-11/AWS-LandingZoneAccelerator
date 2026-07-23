@@ -31,7 +31,7 @@ output "org_id" {
   value       = aws_organizations_organization.org.id
 }
 
-output "allowed_regions" {
-  description = "List of AWS regions permitted across the organization by SCP"
-  value       = var.allowed_regions
+output "regions" {
+  description = "Map of primary and secondary regions permitted across the organization"
+  value       = var.regions
 }
