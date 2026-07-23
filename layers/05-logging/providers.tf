@@ -9,7 +9,7 @@ terraform {
 
 # Default provider (runs in the Management Account)
 provider "aws" {
-  region  = var.aws_region
+  region  = local.allowed_regions.primary
   profile = var.terraform-profile
 }
 
@@ -21,10 +21,14 @@ data "terraform_remote_state" "org" {
   }
 }
 
+locals {
+  allowed_regions = data.terraform_remote_state.org.outputs.allowed_regions
+}
+
 # Log Archive provider (runs inside the LogArchive account via AssumeRole)
 provider "aws" {
   alias   = "log_archive"
-  region  = var.aws_region
+  region  = local.allowed_regions.primary
   profile = var.terraform-profile
 
   assume_role {

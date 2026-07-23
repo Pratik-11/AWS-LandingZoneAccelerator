@@ -11,17 +11,20 @@ data "terraform_remote_state" "org" {
 }
 
 locals {
-  management_account_id    = data.terraform_remote_state.org.outputs.management_account_id
-  audit_account_id         = data.terraform_remote_state.org.outputs.account_ids["Audit"]
-  log_archive_account_id   = data.terraform_remote_state.org.outputs.account_ids["LogArchive"]
-  network_account_id       = data.terraform_remote_state.org.outputs.account_ids["Network"]
+  management_account_id      = data.terraform_remote_state.org.outputs.management_account_id
+  audit_account_id           = data.terraform_remote_state.org.outputs.account_ids["Audit"]
+  log_archive_account_id     = data.terraform_remote_state.org.outputs.account_ids["LogArchive"]
+  network_account_id         = data.terraform_remote_state.org.outputs.account_ids["Network"]
   shared_services_account_id = data.terraform_remote_state.org.outputs.account_ids["SharedServices"]
-  dev_account_id           = data.terraform_remote_state.org.outputs.account_ids["Dev"]
-  prod_account_id          = data.terraform_remote_state.org.outputs.account_ids["Prod"]
-  sandbox_account_id       = data.terraform_remote_state.org.outputs.account_ids["Sandbox"]
+  dev_account_id             = data.terraform_remote_state.org.outputs.account_ids["Dev"]
+  prod_account_id            = data.terraform_remote_state.org.outputs.account_ids["Prod"]
+  sandbox_account_id         = data.terraform_remote_state.org.outputs.account_ids["Sandbox"]
+  # Region map from org layer — IAM Identity Center API calls use the primary region
+  allowed_regions            = data.terraform_remote_state.org.outputs.allowed_regions
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  # IAM Identity Center is global but the API endpoint is region-scoped to the primary region
+  region  = local.allowed_regions.primary
   profile = var.terraform-profile
 }

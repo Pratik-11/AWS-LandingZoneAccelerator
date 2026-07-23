@@ -7,7 +7,7 @@ module "dev_vpc_use1" {
   cidr            = "10.1.0.0/16"
   public_subnets  = ["10.1.1.0/24", "10.1.2.0/24"]
   private_subnets = ["10.1.11.0/24", "10.1.12.0/24"]
-  azs             = ["us-east-1a", "us-east-1b"]
+  azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "dev_use1" {
@@ -35,7 +35,7 @@ module "prod_vpc_use1" {
   providers             = { aws = aws.prod_use1 }
   cidr                  = "10.2.0.0/16"
   private_subnets       = ["10.2.11.0/24", "10.2.12.0/24"]
-  azs                   = ["us-east-1a", "us-east-1b"]
+  azs                   = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
   create_public_subnets = false # Critical Prod security control
 }
 
@@ -68,7 +68,7 @@ module "dev_vpc_aps1" {
   cidr            = "10.11.0.0/16"
   public_subnets  = ["10.11.1.0/24", "10.11.2.0/24"]
   private_subnets = ["10.11.11.0/24", "10.11.12.0/24"]
-  azs             = ["ap-south-1a", "ap-south-1b"]
+  azs             = ["${local.allowed_regions.secondary}a", "${local.allowed_regions.secondary}b"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "dev_aps1" {
@@ -95,7 +95,7 @@ module "prod_vpc_aps1" {
   providers             = { aws = aws.prod_aps1 }
   cidr                  = "10.12.0.0/16"
   private_subnets       = ["10.12.11.0/24", "10.12.12.0/24"]
-  azs                   = ["ap-south-1a", "ap-south-1b"]
+  azs                   = ["${local.allowed_regions.secondary}a", "${local.allowed_regions.secondary}b"]
   create_public_subnets = false
 }
 
@@ -137,7 +137,7 @@ module "shared_vpc_use1" {
   cidr            = "10.3.0.0/16"
   public_subnets  = ["10.3.1.0/24", "10.3.2.0/24"]
   private_subnets = ["10.3.11.0/24", "10.3.12.0/24"]
-  azs             = ["us-east-1a", "us-east-1b"]
+  azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "shared_use1" {
@@ -165,7 +165,7 @@ module "shared_vpc_aps1" {
   cidr            = "10.13.0.0/16"
   public_subnets  = ["10.13.1.0/24", "10.13.2.0/24"]
   private_subnets = ["10.13.11.0/24", "10.13.12.0/24"]
-  azs             = ["ap-south-1a", "ap-south-1b"]
+  azs             = ["${local.allowed_regions.secondary}a", "${local.allowed_regions.secondary}b"]
 }
 resource "aws_ec2_transit_gateway_vpc_attachment" "shared_aps1" {
   provider           = aws.shared_aps1

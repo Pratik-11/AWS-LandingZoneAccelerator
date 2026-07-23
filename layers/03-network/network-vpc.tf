@@ -4,7 +4,7 @@ module "network_vpc_use1" {
   cidr            = "10.0.0.0/16"
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnets = ["10.0.11.0/24", "10.0.12.0/24"]
-  azs             = ["us-east-1a", "us-east-1b"]
+  azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "net_use1" {
@@ -20,7 +20,7 @@ module "network_vpc_aps1" {
   cidr            = "10.10.0.0/16"
   public_subnets  = ["10.10.1.0/24", "10.10.2.0/24"]
   private_subnets = ["10.10.11.0/24", "10.10.12.0/24"]
-  azs             = ["ap-south-1a", "ap-south-1b"]
+  azs             = ["${local.allowed_regions.secondary}a", "${local.allowed_regions.secondary}b"]
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "net_aps1" {

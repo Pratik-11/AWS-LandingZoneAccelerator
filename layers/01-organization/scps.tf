@@ -57,7 +57,7 @@ module "scp_restrict_regions" {
   name        = "restrict-regions"
   description = "Restrict all actions to allowed AWS regions only"
   policy_json = templatefile("${path.module}/../../policies/scp/restrict-regions.json.tpl", {
-    allowed_regions = jsonencode(values(var.regions))
+    allowed_regions = jsonencode(values(var.allowed_regions))
   })
   target_ids = [local.root_id]
 }

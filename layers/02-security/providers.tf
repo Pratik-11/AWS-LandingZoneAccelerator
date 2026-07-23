@@ -33,14 +33,14 @@ provider "aws" {
 # Alias — management explicit (for clarity in resources)
 provider "aws" {
   alias   = "management_use1"
-  region  = var.regions.primary
+  region  = var.allowed_regions.primary
   profile = var.terraform-profile
 }
 
 # Audit Account (Delegated Admin Provider -> for configuring delegated services)
 provider "aws" {
   alias   = "audit_use1"
-  region  = var.regions.primary
+  region  = var.allowed_regions.primary
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.audit_account_id}:role/OrganizationAccountAccessRole"
@@ -52,13 +52,13 @@ provider "aws" {
 # ──────────────────────────────────────────────
 provider "aws" {
   alias   = "management_aps1"
-  region  = var.regions.secondary
+  region  = var.allowed_regions.secondary
   profile = var.terraform-profile
 }
 
 provider "aws" {
   alias   = "audit_aps1"
-  region  = var.regions.secondary
+  region  = var.allowed_regions.secondary
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.audit_account_id}:role/OrganizationAccountAccessRole"

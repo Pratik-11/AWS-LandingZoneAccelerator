@@ -31,7 +31,7 @@ output "org_id" {
   value       = aws_organizations_organization.org.id
 }
 
-output "regions" {
+output "allowed_regions" {
   description = "Map of primary and secondary regions permitted across the organization"
-  value       = var.regions
+  value       = var.allowed_regions
 }

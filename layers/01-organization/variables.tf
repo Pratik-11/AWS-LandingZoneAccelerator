@@ -26,7 +26,7 @@ variable "accounts" {
   }))
 }
 
-variable "regions" {
+variable "allowed_regions" {
   description = "Map of primary and secondary regions"
   type        = map(string)
   default = {

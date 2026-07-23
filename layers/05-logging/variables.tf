@@ -1,7 +1,3 @@
-variable "aws_region" {
-  type    = string
-  default = "us-east-1"
-}
 
 variable "cloudtrail_bucket_name" {
   type = string
