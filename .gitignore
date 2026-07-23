@@ -53,3 +53,7 @@ terraform.rc
 .skills/
 .reports/
 .execution/
+
+# Backend configuration contains customer-specific state locations
+*.tfbackend
+!*.tfbackend.example
