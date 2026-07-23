@@ -3,7 +3,7 @@
 # ──────────────────────────────────────────────
 
 module "config_recorder_dev_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.dev_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -12,7 +12,7 @@ module "config_recorder_dev_use1" {
 }
 
 module "config_recorder_prod_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.prod_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -20,7 +20,7 @@ module "config_recorder_prod_use1" {
 }
 
 module "config_recorder_audit_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.audit_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -28,7 +28,7 @@ module "config_recorder_audit_use1" {
 }
 
 module "config_recorder_log_archive_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.log_archive_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -36,7 +36,7 @@ module "config_recorder_log_archive_use1" {
 }
 
 module "config_recorder_network_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.network_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -44,7 +44,7 @@ module "config_recorder_network_use1" {
 }
 
 module "config_recorder_shared_services_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.shared_services_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -52,7 +52,7 @@ module "config_recorder_shared_services_use1" {
 }
 
 module "config_recorder_sandbox_use1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.sandbox_use1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -64,7 +64,7 @@ module "config_recorder_sandbox_use1" {
 # ──────────────────────────────────────────────
 
 module "config_recorder_dev_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.dev_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -74,7 +74,7 @@ module "config_recorder_dev_aps1" {
 }
 
 module "config_recorder_prod_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.prod_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -84,7 +84,7 @@ module "config_recorder_prod_aps1" {
 }
 
 module "config_recorder_audit_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.audit_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -94,7 +94,7 @@ module "config_recorder_audit_aps1" {
 }
 
 module "config_recorder_log_archive_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.log_archive_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -104,7 +104,7 @@ module "config_recorder_log_archive_aps1" {
 }
 
 module "config_recorder_network_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.network_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -114,7 +114,7 @@ module "config_recorder_network_aps1" {
 }
 
 module "config_recorder_shared_services_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.shared_services_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id
@@ -124,7 +124,7 @@ module "config_recorder_shared_services_aps1" {
 }
 
 module "config_recorder_sandbox_aps1" {
-  source    = "../modules/cofig-recorder"
+  source    = "../modules/config-recorder"
   providers = { aws = aws.sandbox_aps1 }
 
   config_logs_bucket_name = local.config_bucket_id

@@ -109,3 +109,37 @@ module "scp_deny_iam_user_creation" {
   policy_json = file("${path.module}/scp-policies/deny-iam-user-creation.json")
   target_ids  = [module.org_units["Workloads"].ou_id]
 }
+
+# ──────────────────────────────────────────────
+# Infrastructure OU SCPs
+# ──────────────────────────────────────────────
+
+# Policy to prevent non-authorized modification of networking resources
+resource "aws_organizations_policy" "protect_networking" {
+  name        = "protect-networking"
+  description = "Protect networking resources in the Infrastructure OU"
+  content     = file("${path.module}/scp-policies/protect-networking.json")
+}
+
+# Attach the protect-networking SCP to the Infrastructure OU
+resource "aws_organizations_policy_attachment" "protect_networking_attach" {
+  policy_id = aws_organizations_policy.protect_networking.id
+  target_id = module.org_units["Infrastructure"].ou_id
+}
+
+# ──────────────────────────────────────────────
+# Security OU SCPs (Additional)
+# ──────────────────────────────────────────────
+
+# Policy to prevent tampering with security tooling
+resource "aws_organizations_policy" "protect_security_tooling" {
+  name        = "protect-security-tooling"
+  description = "Protect security tooling in the Security OU"
+  content     = file("${path.module}/scp-policies/protect-security-tooling.json")
+}
+
+# Attach the protect-security-tooling SCP to the Security OU
+resource "aws_organizations_policy_attachment" "protect_security_tooling_attach" {
+  policy_id = aws_organizations_policy.protect_security_tooling.id
+  target_id = module.org_units["Security"].ou_id
+}

@@ -13,3 +13,12 @@ variable "alert_email" {
   description = "Email address to receive critical security alerts"
   type        = string
 }
+
+variable "regions" {
+  description = "Map of primary and secondary regions"
+  type        = map(string)
+  default = {
+    primary   = "us-east-1"
+    secondary = "ap-south-1"
+  }
+}

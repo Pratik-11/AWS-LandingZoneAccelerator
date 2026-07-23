@@ -144,7 +144,7 @@ So, we are supposed to go inside each directory and do terraform init, plan and 
 | Task | Module/Location | Status |
 |:-----|:----------------|:-------|
 | Create `configSetup/` root module | `configSetup/main.tf` | Already done ✅ |
-| Create AWS Config Recorder module | `modules/cofig-recorder/` | Already done ✅ |
+| Create AWS Config Recorder module | `modules/config-recorder/` | Already done ✅ |
 | Deploy AWS Config Recorder in each of the 7 member accounts | `configSetup/main.tf` | Already done ✅ |
 | Create Config Aggregator in Management account | `configSetup/main.tf` | Already done ✅ |
 
