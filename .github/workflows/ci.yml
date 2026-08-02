@@ -1,0 +1,53 @@
+name: terraform
+
+# Static checks only — no AWS credentials, no plan, no apply.
+#
+# `terraform validate` needs a provider schema, so each layer is initialised
+# with -backend=false. That downloads the AWS provider but never touches a
+# backend or an AWS account, which is what keeps this credential-free.
+#
+# To add a real `plan` on pull requests, assume the OIDC role created by
+# 00-bootstrap (output: github_actions_role_arn) with aws-actions/configure-
+# aws-credentials, then drop -backend=false. Note that the role ships with no
+# permissions policy attached — see layers/00-bootstrap/README.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: terraform validate
+        run: |
+          failed=0
+          for dir in layers/*/; do
+            echo "::group::${dir}"
+            terraform -chdir="$dir" init -backend=false -input=false || failed=1
+            terraform -chdir="$dir" validate || failed=1
+            echo "::endgroup::"
+          done
+          exit $failed
+
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init
+      - run: tflint --recursive --minimum-failure-severity=error

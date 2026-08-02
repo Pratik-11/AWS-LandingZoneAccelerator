@@ -1,0 +1,46 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# 06-identity — copy to terraform.tfvars and edit.
+#
+# ⚠️  PREREQUISITE: IAM Identity Center must be enabled in the console first.
+# It is a per-org singleton that Terraform cannot create. This layer reads it
+# with `data "aws_ssoadmin_instances"` and will fail with an empty-list error
+# if you skip that step. See docs/KNOWN-LIMITS.md.
+# ─────────────────────────────────────────────────────────────────────────────
+
+terraform-profile = "my-management-profile"
+
+state_bucket        = "acme-lz-terraform-state-a1b2"
+state_bucket_region = "us-east-1"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Users created in the built-in Identity Center directory.
+#
+# `groups` must contain only these exact keys — they map to the groups defined
+# in groups.tf, and an unknown value fails the plan:
+#   platform_engineers  → PowerUserAccess on every account
+#   developers          → DeveloperAccess on Dev/Sandbox, ReadOnly on Prod
+#   security_team       → SecurityAuditAccess on every account but management
+#   finance             → BillingAccess on management only
+#
+# Who gets what is defined in assignments.tf, not here.
+#
+# The built-in directory is fine for a small team or a demo. For anything real,
+# connect an external IdP (Okta / Entra / Google) over SCIM and delete this
+# block — users then sync automatically and offboarding happens in one place.
+# ─────────────────────────────────────────────────────────────────────────────
+sso_users = {
+  "jane.doe" = {
+    display_name = "Jane Doe"
+    given_name   = "Jane"
+    family_name  = "Doe"
+    email        = "jane.doe@example.com"
+    groups       = ["platform_engineers"]
+  }
+  "john.smith" = {
+    display_name = "John Smith"
+    given_name   = "John"
+    family_name  = "Smith"
+    email        = "john.smith@example.com"
+    groups       = ["developers"]
+  }
+}

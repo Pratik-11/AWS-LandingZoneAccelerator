@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# 00-bootstrap — copy to terraform.tfvars and edit before your first apply.
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# This layer runs with a LOCAL backend because the S3 bucket that holds state
+# does not exist yet. See README.md in this directory for the migration step.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# AWS CLI profile with administrator access in the MANAGEMENT (payer) account.
+aws_profile = "my-management-profile"
+
+# Region for the state bucket and lock table. This is your primary region;
+# keep it consistent with allowed_regions.primary in 01-organization.
+aws_region = "us-east-1"
+
+# Short slug for your org. Prefixes the state bucket and lock table names.
+org_name = "acme"
+
+# S3 bucket names are globally unique across ALL AWS accounts, so a bare
+# "acme-lz-terraform-state" will usually collide. Add something unique — the
+# last 4 digits of your management account ID works well.
+unique_id = "a1b2"
+
+# GitHub org/repo permitted to assume the OIDC role for CI.
+# Set github_repo = "*" to allow every repo in the org.
+github_org  = "my-github-org"
+github_repo = "aws-landing-zone"

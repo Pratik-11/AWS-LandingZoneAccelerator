@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# 01-organization — copy to terraform.tfvars and edit.
+#   cp terraform.tfvars.example terraform.tfvars
+# ─────────────────────────────────────────────────────────────────────────────
+
+aws_region        = "us-east-1"
+terraform-profile = "my-management-profile"
+
+# Regions this landing zone operates in. The restrict-regions SCP denies all
+# API calls outside this set, so adding a region here is what unlocks it.
+allowed_regions = {
+  primary   = "us-east-1"
+  secondary = "ap-south-1"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️  THE OU NAMES BELOW ARE LOAD-BEARING.
+# scps.tf looks them up by exact string: module.org_units["Security"], etc.
+# Rename one here and 01-organization stops planning. If you want different
+# OU names, change them in BOTH places.
+# ─────────────────────────────────────────────────────────────────────────────
+ou_names = ["Security", "Infrastructure", "Sandbox", "Workloads"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️  THE ACCOUNT MAP KEYS ARE ALSO LOAD-BEARING.
+# Layers 03, 04, 05 and 06 index this map by exact string —
+# account_ids["Audit"], account_ids["LogArchive"], and so on.
+# Renaming a key here means editing every provider block downstream.
+#
+# Each email must be globally unique across all of AWS and must not already
+# belong to an AWS account. Plus-addressing (aws+audit@…) is the usual trick
+# and works with Google Workspace and Microsoft 365.
+#
+# AWS does not let you delete accounts from Terraform. Creating these is
+# effectively one-way — get the emails right the first time.
+# ─────────────────────────────────────────────────────────────────────────────
+accounts = {
+  Audit          = { email = "aws+audit@example.com", ou_name = "Security" }
+  LogArchive     = { email = "aws+logarchive@example.com", ou_name = "Security" }
+  Network        = { email = "aws+network@example.com", ou_name = "Infrastructure" }
+  SharedServices = { email = "aws+sharedservices@example.com", ou_name = "Infrastructure" }
+  Dev            = { email = "aws+dev@example.com", ou_name = "Workloads" }
+  Prod           = { email = "aws+prod@example.com", ou_name = "Workloads" }
+  Sandbox        = { email = "aws+sandbox@example.com", ou_name = "Sandbox" }
+}
