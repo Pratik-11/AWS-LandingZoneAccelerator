@@ -34,3 +34,14 @@ resource "aws_guardduty_organization_configuration" "audit_org_config" {
 
   depends_on = [aws_guardduty_organization_admin_account.audit_admin]
 }
+variable "audit_account_id" {
+  description = "The AWS Account ID of the Audit account"
+  type        = string
+}
+output "management_detector_id" {
+  value = aws_guardduty_detector.management.id
+}
+
+output "audit_detector_id" {
+  value = aws_guardduty_detector.audit.id
+}

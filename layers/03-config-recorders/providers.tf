@@ -8,7 +8,7 @@ terraform {
 }
 
 # ──────────────────────────────────────────────
-# Remote State References
+# Remote state — account IDs from 01, Config bucket from 02
 # ──────────────────────────────────────────────
 
 data "terraform_remote_state" "org" {
@@ -29,10 +29,6 @@ data "terraform_remote_state" "logging" {
   }
 }
 
-# ──────────────────────────────────────────────
-# Local values for cleaner references
-# ──────────────────────────────────────────────
-
 locals {
   account_ids       = data.terraform_remote_state.org.outputs.account_ids
   allowed_regions   = data.terraform_remote_state.org.outputs.allowed_regions
@@ -40,18 +36,20 @@ locals {
   config_bucket_arn = data.terraform_remote_state.logging.outputs.config_bucket_arn
 }
 
-# ──────────────────────────────────────────────
-# Default Provider (Management Account, primary region)
-# ──────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────────────────
+# One provider per account. THIS is the file to read if you want to understand
+# why multi-account Terraform is shaped the way it is: provider blocks accept no
+# for_each and no count, so N accounts means N hand-written blocks. There is no
+# way around it inside a single root module.
+#
+# docs/KNOWN-LIMITS.md §1 covers the three real options and when to switch.
+# ──────────────────────────────────────────────────────────────────────────────
 
+# Management account, primary region.
 provider "aws" {
   region  = local.allowed_regions.primary
   profile = var.terraform-profile
 }
-
-# ──────────────────────────────────────────────
-# us-east-1 Provider Aliases (already existing, one per account)
-# ──────────────────────────────────────────────
 
 provider "aws" {
   alias   = "dev_use1"
@@ -116,69 +114,14 @@ provider "aws" {
   }
 }
 
-# ──────────────────────────────────────────────
-# ap-south-1 Provider Aliases (NEW, one per account)
-# ──────────────────────────────────────────────
-
+# Second region — only Dev, matching the single worked example in main.tf.
+# Same account, different region, therefore a separate provider. Add one of
+# these per account you want recorded in the secondary region.
 provider "aws" {
   alias   = "dev_aps1"
   region  = local.allowed_regions.secondary
   profile = var.terraform-profile
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "prod_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "audit_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "log_archive_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "network_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "shared_services_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
-  }
-}
-
-provider "aws" {
-  alias   = "sandbox_aps1"
-  region  = local.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"
   }
 }

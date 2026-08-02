@@ -39,3 +39,14 @@ resource "aws_securityhub_organization_configuration" "audit_org_config" {
     aws_securityhub_account.audit
   ]
 }
+variable "audit_account_id" {
+  description = "The AWS Account ID of the Audit account"
+  type        = string
+}
+output "management_hub_arn" {
+  value = aws_securityhub_account.management.arn
+}
+
+output "audit_hub_arn" {
+  value = aws_securityhub_account.audit.arn
+}

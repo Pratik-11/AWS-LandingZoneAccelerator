@@ -27,7 +27,6 @@ provider "aws" {
   profile = var.terraform-profile
 }
 
-
 # ──────────────────────────────────────────────
 # us-east-1 Providers
 # ──────────────────────────────────────────────
@@ -49,20 +48,3 @@ provider "aws" {
   }
 }
 
-# ──────────────────────────────────────────────
-# ap-south-1 Providers
-# ──────────────────────────────────────────────
-provider "aws" {
-  alias   = "management_aps1"
-  region  = var.allowed_regions.secondary
-  profile = var.terraform-profile
-}
-
-provider "aws" {
-  alias   = "audit_aps1"
-  region  = var.allowed_regions.secondary
-  profile = var.terraform-profile
-  assume_role {
-    role_arn = "arn:aws:iam::${local.audit_account_id}:role/OrganizationAccountAccessRole"
-  }
-}

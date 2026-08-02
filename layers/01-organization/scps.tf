@@ -72,7 +72,7 @@ module "scp_protect_log_archive" {
   name        = "protect-log-archive"
   description = "Protect log archive S3 buckets from deletion and tampering"
   policy_json = file("${path.module}/../../policies/scp/protect-log-archive.json")
-  target_ids  = [module.org_units["Security"].ou_id]
+  target_ids  = [aws_organizations_organizational_unit.this["Security"].id]
 }
 
 # ──────────────────────────────────────────────
@@ -85,7 +85,7 @@ module "scp_deny_expensive_services" {
   name        = "deny-expensive-services"
   description = "Deny creation of expensive AWS resources in Sandbox"
   policy_json = file("${path.module}/../../policies/scp/deny-expensive-services.json")
-  target_ids  = [module.org_units["Sandbox"].ou_id]
+  target_ids  = [aws_organizations_organizational_unit.this["Sandbox"].id]
 }
 
 module "scp_deny_network_bridging" {
@@ -94,7 +94,7 @@ module "scp_deny_network_bridging" {
   name        = "deny-network-bridging"
   description = "Deny Sandbox from bridging to other networks"
   policy_json = file("${path.module}/../../policies/scp/deny-network-bridging.json")
-  target_ids  = [module.org_units["Sandbox"].ou_id]
+  target_ids  = [aws_organizations_organizational_unit.this["Sandbox"].id]
 }
 
 # ──────────────────────────────────────────────
@@ -107,7 +107,7 @@ module "scp_deny_iam_user_creation" {
   name        = "deny-iam-user-creation"
   description = "Deny creation of IAM users — enforce SSO access"
   policy_json = file("${path.module}/../../policies/scp/deny-iam-user-creation.json")
-  target_ids  = [module.org_units["Workloads"].ou_id]
+  target_ids  = [aws_organizations_organizational_unit.this["Workloads"].id]
 }
 
 # ──────────────────────────────────────────────
@@ -124,7 +124,7 @@ resource "aws_organizations_policy" "protect_networking" {
 # Attach the protect-networking SCP to the Infrastructure OU
 resource "aws_organizations_policy_attachment" "protect_networking_attach" {
   policy_id = aws_organizations_policy.protect_networking.id
-  target_id = module.org_units["Infrastructure"].ou_id
+  target_id = aws_organizations_organizational_unit.this["Infrastructure"].id
 }
 
 # ──────────────────────────────────────────────
@@ -141,5 +141,5 @@ resource "aws_organizations_policy" "protect_security_tooling" {
 # Attach the protect-security-tooling SCP to the Security OU
 resource "aws_organizations_policy_attachment" "protect_security_tooling_attach" {
   policy_id = aws_organizations_policy.protect_security_tooling.id
-  target_id = module.org_units["Security"].ou_id
+  target_id = aws_organizations_organizational_unit.this["Security"].id
 }

@@ -70,3 +70,7 @@ resource "aws_cloudwatch_event_target" "sns" {
   target_id = "SendToSNS"
   arn       = aws_sns_topic.security_alerts.arn
 }
+variable "alert_email" {
+  description = "The email address to receive critical security alerts"
+  type        = string
+}

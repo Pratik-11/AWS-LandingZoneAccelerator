@@ -3,16 +3,6 @@ variable "terraform-profile" {
   type        = string
 }
 
-variable "tags" {
-  description = "Common tags applied to all taggable resources"
-  type        = map(string)
-  default = {
-    Project   = "LandingZone"
-    Phase     = "Identity"
-    ManagedBy = "Terraform"
-  }
-}
-
 variable "sso_users" {
   description = "Map of SSO users to create in the built-in directory"
   type = map(object({

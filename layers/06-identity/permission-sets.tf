@@ -6,7 +6,6 @@ resource "aws_ssoadmin_permission_set" "power" {
   description      = "Power user access - platform engineers"
   instance_arn     = local.sso_instance_arn
   session_duration = "PT1H"
-  tags             = var.tags
 }
 
 resource "aws_ssoadmin_managed_policy_attachment" "power" {
@@ -23,7 +22,6 @@ resource "aws_ssoadmin_permission_set" "read_only" {
   description      = "Read-only access for auditors and cross-account visibility"
   instance_arn     = local.sso_instance_arn
   session_duration = "PT8H"
-  tags             = var.tags
 }
 
 resource "aws_ssoadmin_managed_policy_attachment" "read_only" {
@@ -40,7 +38,6 @@ resource "aws_ssoadmin_permission_set" "developer" {
   description      = "Developer access - compute, storage, monitoring. No IAM, no billing."
   instance_arn     = local.sso_instance_arn
   session_duration = "PT8H"
-  tags             = var.tags
 }
 
 resource "aws_ssoadmin_permission_set_inline_policy" "developer" {
@@ -108,7 +105,6 @@ resource "aws_ssoadmin_permission_set" "security_audit" {
   description      = "Security team - read security findings, no modifications"
   instance_arn     = local.sso_instance_arn
   session_duration = "PT8H"
-  tags             = var.tags
 }
 
 resource "aws_ssoadmin_managed_policy_attachment" "security_audit" {
@@ -132,7 +128,6 @@ resource "aws_ssoadmin_permission_set" "billing" {
   description      = "Finance team - billing and cost management only"
   instance_arn     = local.sso_instance_arn
   session_duration = "PT4H"
-  tags             = var.tags
 }
 
 resource "aws_ssoadmin_managed_policy_attachment" "billing" {

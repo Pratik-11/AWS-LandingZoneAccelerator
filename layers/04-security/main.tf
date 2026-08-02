@@ -1,8 +1,11 @@
-# ──────────────────────────────────────────────
-# GuardDuty Deployment (Multi-Region)
-# ──────────────────────────────────────────────
+# Every service below follows the same two-step: enable it from the MANAGEMENT
+# account, then administer it from AUDIT. Each module takes both providers for
+# exactly that reason.
 
-module "guardduty_use1" {
+# ──────────────────────────────────────────────
+# GuardDuty
+# ──────────────────────────────────────────────
+module "guardduty" {
   source           = "../../modules/security-guardduty"
   audit_account_id = local.audit_account_id
 
@@ -12,21 +15,10 @@ module "guardduty_use1" {
   }
 }
 
-module "guardduty_aps1" {
-  source           = "../../modules/security-guardduty"
-  audit_account_id = local.audit_account_id
-
-  providers = {
-    aws.management = aws.management_aps1
-    aws.audit      = aws.audit_aps1
-  }
-}
-
 # ──────────────────────────────────────────────
-# Security Hub Deployment (Multi-Region)
+# Security Hub
 # ──────────────────────────────────────────────
-
-module "securityhub_use1" {
+module "securityhub" {
   source           = "../../modules/security-securityhub"
   audit_account_id = local.audit_account_id
 
@@ -36,35 +28,18 @@ module "securityhub_use1" {
   }
 }
 
-module "securityhub_aps1" {
-  source           = "../../modules/security-securityhub"
-  audit_account_id = local.audit_account_id
-
-  providers = {
-    aws.management = aws.management_aps1
-    aws.audit      = aws.audit_aps1
-  }
-}
-
-# ──────────────────────────────────────────────
-# Security Hub Cross-Region Aggregation
-# ──────────────────────────────────────────────
-# This pulls all findings from ap-south-1 (and any future regions) 
-# into us-east-1 inside the Audit account.
-
+# Pulls findings from every region into the primary one, inside Audit. Worth
+# keeping even in a single-region deployment: Security Hub still reports from
+# regions you never deploy to, and those are the interesting ones.
 resource "aws_securityhub_finding_aggregator" "global_aggregator" {
   provider     = aws.audit_use1
   linking_mode = "ALL_REGIONS"
 
-  depends_on = [
-    module.securityhub_use1,
-    module.securityhub_aps1
-  ]
+  depends_on = [module.securityhub]
 }
 
-
 # ──────────────────────────────────────────────
-# IAM Access Analyzer Delegation (Global)
+# IAM Access Analyzer
 # ──────────────────────────────────────────────
 
 resource "aws_iam_service_linked_role" "access_analyzer" {
@@ -76,32 +51,13 @@ resource "aws_organizations_delegated_administrator" "analyzer_admin" {
   service_principal = "access-analyzer.amazonaws.com"
 }
 
-
-# ──────────────────────────────────────────────
-# IAM Access Analyzer Deployment (Multi-Region)
-# ──────────────────────────────────────────────
-
-module "access_analyzer_use1" {
-  source           = "../../modules/security-access-analyzer"
-  audit_account_id = local.audit_account_id
-
-  providers = {
-    aws.audit = aws.audit_use1
-  }
-
-  depends_on = [
-    aws_organizations_delegated_administrator.analyzer_admin,
-    aws_iam_service_linked_role.access_analyzer
-  ]
-}
-
-module "access_analyzer_aps1" {
-  source           = "../../modules/security-access-analyzer"
-  audit_account_id = local.audit_account_id
-
-  providers = {
-    aws.audit = aws.audit_aps1
-  }
+# Plain resource, not a module — it is one resource with no configuration to
+# bundle. The depends_on is load-bearing: delegation and the service-linked role
+# must both exist first, and IAM propagation is not instant.
+resource "aws_accessanalyzer_analyzer" "org" {
+  provider      = aws.audit_use1
+  analyzer_name = "organization-access-analyzer"
+  type          = "ORGANIZATION"
 
   depends_on = [
     aws_organizations_delegated_administrator.analyzer_admin,
@@ -110,10 +66,9 @@ module "access_analyzer_aps1" {
 }
 
 # ──────────────────────────────────────────────
-# Amazon Inspector Deployment (Multi-Region)
+# Amazon Inspector
 # ──────────────────────────────────────────────
-
-module "inspector_use1" {
+module "inspector" {
   source           = "../../modules/security-inspector"
   audit_account_id = local.audit_account_id
   all_account_ids  = local.all_account_ids
@@ -124,21 +79,9 @@ module "inspector_use1" {
   }
 }
 
-module "inspector_aps1" {
-  source           = "../../modules/security-inspector"
-  audit_account_id = local.audit_account_id
-  all_account_ids  = local.all_account_ids
-
-  providers = {
-    aws.management = aws.management_aps1
-    aws.audit      = aws.audit_aps1
-  }
-}
-
 # ──────────────────────────────────────────────
-# Security Alerting (SNS & EventBridge)
+# Alerting — SNS + EventBridge, in Audit
 # ──────────────────────────────────────────────
-
 module "alerts" {
   source      = "../../modules/security-alerts"
   alert_email = var.alert_email
