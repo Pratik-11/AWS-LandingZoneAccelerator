@@ -34,6 +34,12 @@ locals {
   allowed_regions   = data.terraform_remote_state.org.outputs.allowed_regions
   config_bucket_id  = data.terraform_remote_state.logging.outputs.config_bucket_id
   config_bucket_arn = data.terraform_remote_state.logging.outputs.config_bucket_arn
+
+  # Applied automatically to every taggable resource created by this layer.
+  default_tags = {
+    ManagedBy = "terraform"
+    Layer     = "03-config-recorders"
+  }
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -49,6 +55,7 @@ locals {
 provider "aws" {
   region  = local.allowed_regions.primary
   profile = var.terraform-profile
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -58,6 +65,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -67,6 +75,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Prod"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -76,6 +85,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Audit"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -85,6 +95,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["LogArchive"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -94,6 +105,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Network"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -103,6 +115,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["SharedServices"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -112,6 +125,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Sandbox"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 # Second region — only Dev, matching the single worked example in main.tf.
@@ -124,4 +138,5 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.account_ids["Dev"]}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }

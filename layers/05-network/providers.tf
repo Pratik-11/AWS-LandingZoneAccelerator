@@ -13,13 +13,30 @@ data "terraform_remote_state" "org" {
   }
 }
 
+data "terraform_remote_state" "logging" {
+  backend = "s3"
+  config = {
+    bucket = var.state_bucket
+    key    = "lz/02-logging/terraform.tfstate"
+    region = var.state_bucket_region
+  }
+}
+
 locals {
+  flow_logs_bucket_arn = data.terraform_remote_state.logging.outputs.flow_logs_bucket_arn
+
   network_account = data.terraform_remote_state.org.outputs.account_ids["Network"]
   dev_account     = data.terraform_remote_state.org.outputs.account_ids["Dev"]
   prod_account    = data.terraform_remote_state.org.outputs.account_ids["Prod"]
   shared_account  = data.terraform_remote_state.org.outputs.account_ids["SharedServices"]
   sandbox_account = data.terraform_remote_state.org.outputs.account_ids["Sandbox"]
   allowed_regions = data.terraform_remote_state.org.outputs.allowed_regions
+
+  # Applied automatically to every taggable resource created by this layer.
+  default_tags = {
+    ManagedBy = "terraform"
+    Layer     = "05-network"
+  }
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -35,6 +52,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.network_account}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -44,6 +62,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.dev_account}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -53,6 +72,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.prod_account}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -62,6 +82,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.shared_account}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 provider "aws" {
@@ -71,6 +92,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.sandbox_account}:role/OrganizationAccountAccessRole"
   }
+  default_tags { tags = local.default_tags }
 }
 
 # ──────────────────────────────────────────────────────────────────────────────

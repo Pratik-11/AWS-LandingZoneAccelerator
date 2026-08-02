@@ -72,3 +72,22 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 }
+
+# VPC Flow Logs
+#
+# Delivered straight to S3 in the LogArchive account. The alternative —
+# CloudWatch Logs — needs an IAM role in every account and costs considerably
+# more at volume; S3 delivery needs neither, only a bucket policy trusting
+# delivery.logs.amazonaws.com (see modules/logging-bucket).
+#
+# Optional so the module stays usable standalone. Omit the destination and no
+# flow log is created.
+resource "aws_flow_log" "this" {
+  count = var.flow_logs_destination_arn == null ? 0 : 1
+
+  vpc_id                   = aws_vpc.this.id
+  traffic_type             = "ALL"
+  log_destination_type     = "s3"
+  log_destination          = "${var.flow_logs_destination_arn}/vpc-flow-logs/"
+  max_aggregation_interval = 600 # 10 min. Use 60 only if you need fast forensics — it costs ~10x.
+}

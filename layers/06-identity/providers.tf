@@ -31,4 +31,11 @@ provider "aws" {
   # IAM Identity Center is global but the API endpoint is region-scoped to the primary region
   region  = local.allowed_regions.primary
   profile = var.terraform-profile
+
+  default_tags {
+    tags = {
+      ManagedBy = "terraform"
+      Layer     = "06-identity"
+    }
+  }
 }

@@ -5,6 +5,8 @@ module "network_vpc_use1" {
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnets = ["10.0.11.0/24", "10.0.12.0/24"]
   azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
+
+  flow_logs_destination_arn = local.flow_logs_bucket_arn
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "net_use1" {

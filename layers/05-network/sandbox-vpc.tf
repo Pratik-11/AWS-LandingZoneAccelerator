@@ -5,4 +5,6 @@ module "sandbox_use1" {
   public_subnets  = ["10.9.1.0/24"]
   private_subnets = ["10.9.11.0/24"]
   azs             = ["${local.allowed_regions.primary}a"]
+
+  flow_logs_destination_arn = local.flow_logs_bucket_arn
 }

@@ -62,6 +62,17 @@ module "scp_restrict_regions" {
   target_ids = [local.root_id]
 }
 
+# Public S3 is a data-exposure path, so this one applies everywhere — including
+# Sandbox. Experimentation is fine; leaking a bucket is not.
+module "scp_deny_public_s3" {
+  source = "../../modules/scp"
+
+  name        = "deny-public-s3"
+  description = "Deny setting public-read or public-read-write ACLs on S3"
+  policy_json = file("${path.module}/../../policies/scp/deny-public-s3.json")
+  target_ids  = [local.root_id]
+}
+
 # ──────────────────────────────────────────────
 # Security OU SCPs
 # ──────────────────────────────────────────────
@@ -107,6 +118,36 @@ module "scp_deny_iam_user_creation" {
   name        = "deny-iam-user-creation"
   description = "Deny creation of IAM users — enforce SSO access"
   policy_json = file("${path.module}/../../policies/scp/deny-iam-user-creation.json")
+  target_ids  = [aws_organizations_organizational_unit.this["Workloads"].id]
+}
+
+# Encryption and instance-metadata hygiene, scoped to Workloads rather than Root
+# so Sandbox stays usable for experiments with older AMIs and quick throwaway
+# resources. Move these to local.root_id if you want them org-wide.
+module "scp_require_imdsv2" {
+  source = "../../modules/scp"
+
+  name        = "require-imdsv2"
+  description = "Deny launching EC2 instances that allow IMDSv1"
+  policy_json = file("${path.module}/../../policies/scp/require-imdsv2.json")
+  target_ids  = [aws_organizations_organizational_unit.this["Workloads"].id]
+}
+
+module "scp_require_ebs_encryption" {
+  source = "../../modules/scp"
+
+  name        = "require-ebs-encryption"
+  description = "Deny launching EC2 instances with unencrypted EBS volumes"
+  policy_json = file("${path.module}/../../policies/scp/require-ebs-encryption.json")
+  target_ids  = [aws_organizations_organizational_unit.this["Workloads"].id]
+}
+
+module "scp_deny_unencrypted_rds" {
+  source = "../../modules/scp"
+
+  name        = "deny-unencrypted-rds"
+  description = "Deny creating or restoring unencrypted RDS instances"
+  policy_json = file("${path.module}/../../policies/scp/deny-unencrypted-rds.json")
   target_ids  = [aws_organizations_organizational_unit.this["Workloads"].id]
 }
 

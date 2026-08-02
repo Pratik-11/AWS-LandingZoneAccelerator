@@ -8,6 +8,8 @@ module "dev_vpc_use1" {
   public_subnets  = ["10.1.1.0/24", "10.1.2.0/24"]
   private_subnets = ["10.1.11.0/24", "10.1.12.0/24"]
   azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
+
+  flow_logs_destination_arn = local.flow_logs_bucket_arn
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "dev_use1" {
@@ -37,6 +39,8 @@ module "prod_vpc_use1" {
   private_subnets       = ["10.2.11.0/24", "10.2.12.0/24"]
   azs                   = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
   create_public_subnets = false # the Prod security control that matters most
+
+  flow_logs_destination_arn = local.flow_logs_bucket_arn
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "prod_use1" {
@@ -71,6 +75,8 @@ module "shared_vpc_use1" {
   public_subnets  = ["10.3.1.0/24", "10.3.2.0/24"]
   private_subnets = ["10.3.11.0/24", "10.3.12.0/24"]
   azs             = ["${local.allowed_regions.primary}a", "${local.allowed_regions.primary}b"]
+
+  flow_logs_destination_arn = local.flow_logs_bucket_arn
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "shared_use1" {
