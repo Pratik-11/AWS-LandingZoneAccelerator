@@ -12,7 +12,7 @@ data "aws_organizations_organization" "current" {}
 # across all accounts in the organization.
 resource "aws_securityhub_configuration_policy" "org_policy" {
   provider = aws.audit_use1
-  name     = "configuration-policy-01"  # match exactly
+  name     = "configuration-policy-01" # match exactly
 
   configuration_policy {
     service_enabled = true

@@ -6,8 +6,12 @@ terraform {
 }
 
 data "terraform_remote_state" "org" {
-  backend = "local"
-  config  = { path = "../../layers/01-organization/terraform.tfstate" }
+  backend = "s3"
+  config = {
+    bucket = var.state_bucket
+    key    = "lz/01-organization/terraform.tfstate"
+    region = var.state_bucket_region
+  }
 }
 
 locals {
@@ -20,7 +24,7 @@ locals {
   prod_account_id            = data.terraform_remote_state.org.outputs.account_ids["Prod"]
   sandbox_account_id         = data.terraform_remote_state.org.outputs.account_ids["Sandbox"]
   # Region map from org layer — IAM Identity Center API calls use the primary region
-  allowed_regions            = data.terraform_remote_state.org.outputs.allowed_regions
+  allowed_regions = data.terraform_remote_state.org.outputs.allowed_regions
 }
 
 provider "aws" {

@@ -1,6 +1,6 @@
 output "ou_ids" {
   description = "A map of OU names to their corresponding IDs"
-  
+
   # This loops through all created modules and builds a map: { "Security" = "ou-1234", ... }
   value = { for name, ou in module.org_units : name => ou.ou_id }
 }
@@ -34,4 +34,8 @@ output "org_id" {
 output "allowed_regions" {
   description = "Map of primary and secondary regions permitted across the organization"
   value       = var.allowed_regions
+}
+output "management_account_id" {
+  description = "Account ID of the management (payer) account this layer runs in"
+  value       = aws_organizations_organization.org.master_account_id
 }

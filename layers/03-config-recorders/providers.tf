@@ -12,16 +12,20 @@ terraform {
 # ──────────────────────────────────────────────
 
 data "terraform_remote_state" "org" {
-  backend = "local"
+  backend = "s3"
   config = {
-    path = "../organisation/terraform.tfstate"
+    bucket = var.state_bucket
+    key    = "lz/01-organization/terraform.tfstate"
+    region = var.state_bucket_region
   }
 }
 
 data "terraform_remote_state" "logging" {
-  backend = "local"
+  backend = "s3"
   config = {
-    path = "../logging/terraform.tfstate"
+    bucket = var.state_bucket
+    key    = "lz/02-logging/terraform.tfstate"
+    region = var.state_bucket_region
   }
 }
 
@@ -30,9 +34,9 @@ data "terraform_remote_state" "logging" {
 # ──────────────────────────────────────────────
 
 locals {
-  account_ids      = data.terraform_remote_state.org.outputs.account_ids
-  allowed_regions  = data.terraform_remote_state.org.outputs.allowed_regions
-  config_bucket_id = data.terraform_remote_state.logging.outputs.config_bucket_id
+  account_ids       = data.terraform_remote_state.org.outputs.account_ids
+  allowed_regions   = data.terraform_remote_state.org.outputs.allowed_regions
+  config_bucket_id  = data.terraform_remote_state.logging.outputs.config_bucket_id
   config_bucket_arn = data.terraform_remote_state.logging.outputs.config_bucket_arn
 }
 

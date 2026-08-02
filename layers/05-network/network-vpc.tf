@@ -1,5 +1,5 @@
 module "network_vpc_use1" {
-  source = "../../modules/vpc"
+  source          = "../../modules/vpc"
   providers       = { aws = aws.network_use1 }
   cidr            = "10.0.0.0/16"
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
@@ -15,7 +15,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "net_use1" {
 }
 
 module "network_vpc_aps1" {
-  source = "../../modules/vpc"
+  source          = "../../modules/vpc"
   providers       = { aws = aws.network_aps1 }
   cidr            = "10.10.0.0/16"
   public_subnets  = ["10.10.1.0/24", "10.10.2.0/24"]

@@ -6,15 +6,15 @@ resource "aws_organizations_delegated_administrator" "config_admin" {
 
 # STEP 2: IAM Role for the Aggregator in the Audit account
 resource "aws_iam_role" "config_aggregator_role_audit" {
-  provider           = aws.audit_use1
-  name               = "AWSConfigAggregatorRoleAudit"
+  provider = aws.audit_use1
+  name     = "AWSConfigAggregatorRoleAudit"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = { Service = "config.amazonaws.com" }
-        Action = "sts:AssumeRole"
+        Action    = "sts:AssumeRole"
       }
     ]
   })

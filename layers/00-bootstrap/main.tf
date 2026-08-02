@@ -84,8 +84,8 @@ resource "aws_dynamodb_table" "terraform_locks" {
 # Registers GitHub Actions as a trusted OIDC identity provider in this AWS account.
 # This enables keyless authentication from GitHub CI/CD pipelines via short-lived tokens.
 resource "aws_iam_openid_connect_provider" "github_actions" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
   # This thumbprint is the publicly documented fingerprint for GitHub's OIDC TLS certificate.
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }

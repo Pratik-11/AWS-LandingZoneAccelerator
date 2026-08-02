@@ -15,9 +15,11 @@ provider "aws" {
 
 # Data source to read outputs from the organisation module
 data "terraform_remote_state" "org" {
-  backend = "local"
+  backend = "s3"
   config = {
-    path = "../../layers/01-organization/terraform.tfstate"
+    bucket = var.state_bucket
+    key    = "lz/01-organization/terraform.tfstate"
+    region = var.state_bucket_region
   }
 }
 

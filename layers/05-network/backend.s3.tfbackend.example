@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# EXAMPLE: S3 Remote Backend Configuration — 06-AWSconfigRecordersSetup layer
+# EXAMPLE: S3 Remote Backend Configuration — 05-network layer
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # STEP 1: Copy this file to backend.s3.tfbackend
@@ -17,7 +17,7 @@
 #                  Example: "acme-lz-terraform-state-a1b2"
 #
 # key            — Unique path inside the bucket for THIS layer's state file.
-#                  Do NOT change this — it is pre-set for 06-AWSconfigRecordersSetup.
+#                  Do NOT change this — it is pre-set for 05-network.
 #
 # region         — The AWS region where your S3 bucket was created.
 #                  Must match var.aws_region in 00-bootstrap (default: us-east-1).
@@ -30,7 +30,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 bucket         = "<org_name>-lz-terraform-state-<unique_id>"
-key            = "lz/06-AWSconfigRecordersSetup/terraform.tfstate"
+key            = "lz/05-network/terraform.tfstate"
 region         = "us-east-1"
 dynamodb_table = "<org_name>-lz-terraform-locks-<unique_id>"
 encrypt        = true

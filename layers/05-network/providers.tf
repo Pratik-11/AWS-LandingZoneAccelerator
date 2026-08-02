@@ -5,8 +5,12 @@ terraform {
 }
 
 data "terraform_remote_state" "org" {
-  backend = "local"
-  config = { path = "../../layers/01-organization/terraform.tfstate" }
+  backend = "s3"
+  config = {
+    bucket = var.state_bucket
+    key    = "lz/01-organization/terraform.tfstate"
+    region = var.state_bucket_region
+  }
 }
 
 locals {

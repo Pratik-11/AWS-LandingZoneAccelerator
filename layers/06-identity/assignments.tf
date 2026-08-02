@@ -6,7 +6,7 @@ locals {
   account_assignments = {
 
     # ── PlatformEngineers → PowerUserAccess → ALL accounts ──────────────
-    "platform-power-management"    = {
+    "platform-power-management" = {
       group_id = aws_identitystore_group.platform_engineers.group_id
       ps_arn   = aws_ssoadmin_permission_set.power.arn
       account  = local.management_account_id

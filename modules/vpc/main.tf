@@ -56,7 +56,7 @@ resource "aws_route_table_association" "public" {
 # Private Route Table
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
-  
+
   # Route outbound internet traffic to NAT Gateway ONLY if public subnets exist (Dev/Shared)
   dynamic "route" {
     for_each = var.create_public_subnets ? [1] : []

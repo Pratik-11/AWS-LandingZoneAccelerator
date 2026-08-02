@@ -42,18 +42,18 @@ resource "aws_s3_bucket_policy" "this" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AWSCloudTrailAclCheck"
-        Effect = "Allow"
+        Sid       = "AWSCloudTrailAclCheck"
+        Effect    = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
-        Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.this.arn
+        Action    = "s3:GetBucketAcl"
+        Resource  = aws_s3_bucket.this.arn
       },
       {
-        Sid    = "AWSCloudTrailWrite"
-        Effect = "Allow"
+        Sid       = "AWSCloudTrailWrite"
+        Effect    = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.this.arn}/AWSLogs/*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.this.arn}/AWSLogs/*"
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
@@ -61,25 +61,25 @@ resource "aws_s3_bucket_policy" "this" {
         }
       }
     ]
-  }) : jsonencode({
+    }) : jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AWSConfigAclCheck"
-        Effect = "Allow"
+        Sid       = "AWSConfigAclCheck"
+        Effect    = "Allow"
         Principal = { AWS = "*" }
-        Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.this.arn
+        Action    = "s3:GetBucketAcl"
+        Resource  = aws_s3_bucket.this.arn
         Condition = {
           StringEquals = { "aws:PrincipalOrgID" = var.org_id }
         }
       },
       {
-        Sid    = "AWSConfigWrite"
-        Effect = "Allow"
+        Sid       = "AWSConfigWrite"
+        Effect    = "Allow"
         Principal = { AWS = "*" }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.this.arn}/AWSLogs/*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.this.arn}/AWSLogs/*"
         Condition = {
           StringEquals = {
             "aws:PrincipalOrgID" = var.org_id

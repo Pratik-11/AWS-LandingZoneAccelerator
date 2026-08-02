@@ -18,7 +18,7 @@ resource "aws_ram_sharing_with_organization" "org_sharing" {
 }
 
 module "org_units" {
-  source = "../../modules/ou"
+  source   = "../../modules/ou"
   for_each = var.ou_names
 
   # each.value represents the current string in the loop (e.g. "Security")
@@ -27,7 +27,7 @@ module "org_units" {
 }
 
 module "accounts" {
-  source = "../../modules/accounts"
+  source   = "../../modules/accounts"
   for_each = var.accounts
 
   name      = each.key

@@ -28,8 +28,8 @@ resource "aws_guardduty_detector" "audit" {
 
 # STEP 4: Audit Account auto-enables for all members
 resource "aws_guardduty_organization_configuration" "audit_org_config" {
-  provider    = aws.audit
-  detector_id = aws_guardduty_detector.audit.id
+  provider                         = aws.audit
+  detector_id                      = aws_guardduty_detector.audit.id
   auto_enable_organization_members = "ALL"
 
   depends_on = [aws_guardduty_organization_admin_account.audit_admin]

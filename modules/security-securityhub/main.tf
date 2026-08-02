@@ -10,10 +10,10 @@ terraform {
 # STEP 1: Enable Security Hub in Management Account
 resource "aws_securityhub_account" "management" {
   provider = aws.management
-  
+
   # Prevents turning on default standards automatically to control costs/noise if desired. 
   # Set to true if you want AWS Foundational Security Best Practices enabled automatically.
-  enable_default_standards = true 
+  enable_default_standards = true
 }
 
 # STEP 2: Delegate Security Hub to Audit Account

@@ -1,5 +1,5 @@
 module "sandbox_use1" {
-  source = "../../modules/vpc"
+  source          = "../../modules/vpc"
   providers       = { aws = aws.sandbox_use1 }
   cidr            = "10.9.0.0/16"
   public_subnets  = ["10.9.1.0/24"]
@@ -8,7 +8,7 @@ module "sandbox_use1" {
 }
 
 module "sandbox_aps1" {
-  source = "../../modules/vpc"
+  source          = "../../modules/vpc"
   providers       = { aws = aws.sandbox_aps1 }
   cidr            = "10.19.0.0/16"
   public_subnets  = ["10.19.1.0/24"]

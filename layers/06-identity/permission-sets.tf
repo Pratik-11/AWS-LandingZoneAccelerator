@@ -59,21 +59,21 @@ resource "aws_ssoadmin_permission_set_inline_policy" "developer" {
         Resource = "*"
       },
       {
-        Sid    = "StorageAccess"
-        Effect = "Allow"
-        Action = ["s3:*", "rds:*", "dynamodb:*", "elasticache:*"]
+        Sid      = "StorageAccess"
+        Effect   = "Allow"
+        Action   = ["s3:*", "rds:*", "dynamodb:*", "elasticache:*"]
         Resource = "*"
       },
       {
-        Sid    = "ObservabilityAccess"
-        Effect = "Allow"
-        Action = ["cloudwatch:*", "logs:*", "xray:*", "cloudformation:*"]
+        Sid      = "ObservabilityAccess"
+        Effect   = "Allow"
+        Action   = ["cloudwatch:*", "logs:*", "xray:*", "cloudformation:*"]
         Resource = "*"
       },
       {
-        Sid    = "MessagingAccess"
-        Effect = "Allow"
-        Action = ["sns:*", "sqs:*", "events:*"]
+        Sid      = "MessagingAccess"
+        Effect   = "Allow"
+        Action   = ["sns:*", "sqs:*", "events:*"]
         Resource = "*"
       },
       {
@@ -85,15 +85,15 @@ resource "aws_ssoadmin_permission_set_inline_policy" "developer" {
         Resource = "*"
       },
       {
-        Sid    = "DenyBilling"
-        Effect = "Deny"
-        Action = ["aws-portal:*", "budgets:*", "ce:*", "cur:*", "billing:*"]
+        Sid      = "DenyBilling"
+        Effect   = "Deny"
+        Action   = ["aws-portal:*", "budgets:*", "ce:*", "cur:*", "billing:*"]
         Resource = "*"
       },
       {
-        Sid    = "DenyOrganizationActions"
-        Effect = "Deny"
-        Action = ["organizations:*"]
+        Sid      = "DenyOrganizationActions"
+        Effect   = "Deny"
+        Action   = ["organizations:*"]
         Resource = "*"
       }
     ]

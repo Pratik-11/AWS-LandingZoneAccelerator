@@ -18,7 +18,7 @@ resource "aws_inspector2_enabler" "audit_account" {
   provider       = aws.audit
   account_ids    = [var.audit_account_id]
   resource_types = ["EC2", "ECR", "LAMBDA"]
-  
+
   depends_on = [aws_inspector2_delegated_admin_account.audit_admin]
 }
 
@@ -36,7 +36,7 @@ resource "aws_inspector2_enabler" "member_accounts" {
   provider       = aws.audit
   account_ids    = [for id in var.all_account_ids : id if id != var.audit_account_id]
   resource_types = ["EC2", "ECR", "LAMBDA"]
-  
+
   depends_on = [aws_inspector2_member_association.members]
 }
 

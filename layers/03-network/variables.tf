@@ -1,1 +1,0 @@
-variable "terraform-profile" { type = string }
