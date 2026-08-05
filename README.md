@@ -54,7 +54,8 @@ Read in this order. It takes about half an hour and it is the point of the repo.
 | **[docs/DECISIONS.md](docs/DECISIONS.md)** | Why it is shaped this way, and what the alternatives were |
 | **[docs/STATE.md](docs/STATE.md)** | How state is split, and the blast radius of each layer |
 | **[docs/KNOWN-LIMITS.md](docs/KNOWN-LIMITS.md)** | What Terraform and AWS will not let you do. **Read §1 before copying anything** |
-| **[docs/ADAPTING.md](docs/ADAPTING.md)** | Every value you must change before your first apply |
+| **[docs/DEPLOYING.md](docs/DEPLOYING.md)** | Prerequisites, the config file, apply order, verification, troubleshooting |
+| **[docs/ADAPTING.md](docs/ADAPTING.md)** | What to change to make it yours, and which changes are bigger than they look |
 | `layers/*/README.md` | What each layer creates, depends on, and can break |
 
 Then read `layers/01-organization/scps.tf` and
@@ -93,7 +94,9 @@ sequence, deliberately. See [docs/DECISIONS.md §1](docs/DECISIONS.md).
 
 ## Running it
 
-Full detail in **[docs/ADAPTING.md](docs/ADAPTING.md)**. The shape:
+Full detail in **[docs/DEPLOYING.md](docs/DEPLOYING.md)** — including the two
+console steps Terraform cannot do, what each layer takes, and what to do when
+it stops. The shape:
 
 ```bash
 # Once, in the console: enable IAM Identity Center, activate IAM billing access.
@@ -112,6 +115,10 @@ make apply LAYER=05-network
 `make deploy` also handles `00-bootstrap`'s local-backend-then-migrate step.
 The generated `terraform.tfvars.json` and `backend.s3.tfbackend` are gitignored;
 the YAML is the thing you keep.
+
+Budget 25–40 minutes end to end. `01-organization` is most of it — AWS
+rate-limits account creation, and a timeout mid-run is normal rather than a
+failure. Re-run and it continues.
 
 **`01-organization` is slow and effectively one-way.** Account creation takes
 minutes each and AWS rate-limits it; a mid-run timeout is normal, just re-apply.

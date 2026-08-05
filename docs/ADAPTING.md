@@ -1,28 +1,15 @@
 # Adapting this repo
 
-Everything you must change before your first apply, in the order you hit it.
+What to change to make this repo yours, and which changes are bigger than they
+look.
 
-Work through it top to bottom. Nothing here is optional — the repo ships with
-placeholder values that will not work in your account.
-
----
-
-## 1. Before you touch Terraform
-
-| # | Do this | Why |
-|---|---|---|
-| 1 | Create the management (payer) account, or use an existing one | Everything is created from here |
-| 2 | Configure an AWS CLI profile with admin access to it | Every layer takes `terraform-profile` |
-| 3 | Decide your email convention — `aws+<account>@yourdomain.com` | Account emails must be globally unique and permanent |
-| 4 | Enable **IAM Identity Center** in the console | Terraform cannot create it; `06-identity` reads it as a data source |
-| 5 | Activate **IAM access to billing** in the management account | Otherwise `BillingAccess` silently does nothing |
-
-Steps 4 and 5 are one-time console actions with no Terraform equivalent. See
-[KNOWN-LIMITS.md](KNOWN-LIMITS.md).
+**To actually deploy, read [DEPLOYING.md](DEPLOYING.md) instead** — prerequisites,
+apply order, verification and troubleshooting all live there. This page is the
+reference you come back to when you want to alter something.
 
 ---
 
-## 2. Every value you must change
+## 1. Every value you must change
 
 All of them live in **`configs/landing-zone.yaml`**. There is one file, and no
 value appears in it twice.
@@ -51,7 +38,7 @@ bucket names come from `org_name` + `unique_id`. Override under
 
 ---
 
-## 3. The three renames that break things
+## 2. The three renames that break things
 
 These are the traps. Everything else is a one-line edit.
 
@@ -86,7 +73,7 @@ entry in that map, and rows in `assignments.tf`.
 
 ---
 
-## 4. VPC CIDRs are in the code, not in tfvars
+## 3. VPC CIDRs are in the code, not in tfvars
 
 Deliberate: the whole address plan is readable in three files instead of being
 assembled at plan time.
@@ -100,38 +87,7 @@ region in a clearly separate block so the plan stays readable.
 
 ---
 
-## 5. Apply order
-
-Strict. Each layer reads the one before it.
-
-```bash
-00-bootstrap → 01-organization → 02-logging → 03-config-recorders
-            → 04-security → 05-network → 06-identity
-```
-
-One shot:
-
-```bash
-make deploy          # renders the YAML, then applies 00 → 06 in order
-```
-
-Or a layer at a time, which is what you want while you are still reading:
-
-```bash
-make plan  LAYER=05-network
-make apply LAYER=05-network
-```
-
-`make deploy` handles the `00-bootstrap` local-backend-then-migrate dance for
-you. Doing it by hand is still documented in `layers/00-bootstrap/README.md` —
-worth reading once even if you never do it manually.
-
-**Account creation is slow.** `01-organization` takes several minutes per account
-and AWS rate-limits it. A timeout mid-run is normal; re-apply and it continues.
-
----
-
-## 6. Deciding what to delete
+## 4. Deciding what to delete
 
 This is a reference, not a product. Deleting is expected.
 
@@ -148,14 +104,14 @@ There is no feature flag anywhere in this repo. What you can read is what you ge
 
 ---
 
-## 7. Before you call it done
+---
 
-- [ ] Every account's root user has MFA and its credentials are in a vault
-- [ ] The SNS alert subscription is **confirmed** (check the email)
-- [ ] `restrict-regions` lists every region you actually use
-- [ ] The CI OIDC role has a permissions policy — it ships with none
-- [ ] Prod egress works end to end (see the trap in `05-network/README.md`)
-- [ ] Log buckets have a lifecycle policy matching your retention requirement
-- [ ] A break-glass path exists for Identity Center being unavailable
-- [ ] `terraform.tfvars.json` and `*.tfbackend` are gitignored — verify before pushing
-- [ ] `configs/landing-zone.yaml` has your real emails in it — decide whether that file belongs in a public repo
+## 5. After deploying
+
+The checks worth doing once the landing zone is up are in
+[DEPLOYING.md §4](DEPLOYING.md). The two that catch people:
+
+- The SNS alert subscription stays `PendingConfirmation` until someone clicks
+  the link in the email. No alert is delivered until then, and nothing warns you.
+- The CI OIDC role from `00-bootstrap` ships with **no permissions policy
+  attached**. It can be assumed and can do nothing until you attach one.
