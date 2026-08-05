@@ -3,10 +3,16 @@
 A complete, working, multi-account AWS landing zone built in plain Terraform. No
 Control Tower, no AFT, no framework.
 
-**This is a reference, not a product.** There is no wizard, no config language and
-no feature flags. You clone it, read it, delete what you don't need and change the
-rest. It is meant to save you the weeks of working out *what* a landing zone
-contains and *in what order* it has to be built — not to hand you a running one.
+**This is a reference first and a deployer second.** You clone it, read it,
+delete what you don't need and change the rest — it exists to save you the weeks
+of working out *what* a landing zone contains and *in what order* it has to be
+built.
+
+It also deploys in one command. `configs/landing-zone.yaml` holds every value
+you must supply, and `make deploy` applies all seven layers in order. What the
+YAML does *not* have is feature switches: it supplies values, never decides
+which resources exist. That stays readable in the Terraform, for a reason
+documented in [docs/DECISIONS.md §6](docs/DECISIONS.md).
 
 If you want a turnkey deployment, use Control Tower. If you want to understand
 what Control Tower does so you can build and own the equivalent, start here.
@@ -70,6 +76,8 @@ layers/          ← deployment units. Applied in order. Each has its own state.
   05-network          Transit Gateway, VPCs, RAM sharing, private DNS
   06-identity         Identity Center: permission sets, groups, assignments
 
+configs/         ← landing-zone.yaml: every value you supply, exactly once
+scripts/         ← render.py fans the YAML out; deploy.sh / teardown.sh drive it
 modules/         ← library. Never applied directly.
 policies/scp/    ← SCP documents as JSON
 docs/            ← the part that makes this a reference rather than a snapshot
@@ -90,21 +98,20 @@ Full detail in **[docs/ADAPTING.md](docs/ADAPTING.md)**. The shape:
 ```bash
 # Once, in the console: enable IAM Identity Center, activate IAM billing access.
 
-cd layers/00-bootstrap
-cp terraform.tfvars.example terraform.tfvars     # edit
-terraform init && terraform apply
-terraform output                                 # every other layer needs these
-
-# Then, for 01 → 06 in order:
-cd ../01-organization
-cp terraform.tfvars.example terraform.tfvars           # edit
-cp backend.s3.tfbackend.example backend.s3.tfbackend   # edit
-terraform init -backend-config=backend.s3.tfbackend
-terraform plan && terraform apply
+$EDITOR configs/landing-zone.yaml    # emails, regions, profile — one file
+make deploy                          # renders it, then applies 00 → 06 in order
 ```
 
-Neither `terraform.tfvars` nor `*.tfbackend` is committed — only the `.example`
-files are. Both are gitignored.
+Or a layer at a time, which is what you want while you are still reading it:
+
+```bash
+make plan  LAYER=05-network
+make apply LAYER=05-network
+```
+
+`make deploy` also handles `00-bootstrap`'s local-backend-then-migrate step.
+The generated `terraform.tfvars.json` and `backend.s3.tfbackend` are gitignored;
+the YAML is the thing you keep.
 
 **`01-organization` is slow and effectively one-way.** Account creation takes
 minutes each and AWS rate-limits it; a mid-run timeout is normal, just re-apply.

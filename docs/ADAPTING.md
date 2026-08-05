@@ -24,29 +24,30 @@ Steps 4 and 5 are one-time console actions with no Terraform equivalent. See
 
 ## 2. Every value you must change
 
-Each layer ships a `terraform.tfvars.example`. Copy it and edit:
+All of them live in **`configs/landing-zone.yaml`**. There is one file, and no
+value appears in it twice.
 
 ```bash
-cd layers/<layer>
-cp terraform.tfvars.example terraform.tfvars
+$EDITOR configs/landing-zone.yaml
+make render     # fans it out to layers/*/terraform.tfvars.json + backend.s3.tfbackend
 ```
 
-| Value | Where | Notes |
-|---|---|---|
-| `aws_profile` / `terraform-profile` | every layer | Your management account CLI profile |
-| `org_name` | `00-bootstrap` | Prefixes state bucket and lock table |
-| `unique_id` | `00-bootstrap` | S3 names are globally unique — collisions are guaranteed without this |
-| `github_org` / `github_repo` | `00-bootstrap` | Who may assume the CI OIDC role |
-| `state_bucket` / `state_bucket_region` | layers 02–06 | From `00-bootstrap` outputs |
-| `allowed_regions` | `01-organization`, `04-security` | **Must match.** The `restrict-regions` SCP denies everything outside this set |
-| `accounts` | `01-organization` | Emails must be unique, unused, and permanent |
-| `cloudtrail_bucket_name` / `config_bucket_name` / `flow_logs_bucket_name` | `02-logging` | All globally unique |
-| `alert_email` | `04-security` | Confirm the SNS subscription email or alerts go nowhere |
-| `sso_users` | `06-identity` | Or delete and connect an external IdP |
-| VPC CIDRs | `05-network` **(in `.tf` files, not tfvars)** | See below |
+Both generated files are gitignored — the YAML is the thing you keep.
 
-Also write a `backend.s3.tfbackend` per layer from the committed
-`backend.s3.tfbackend.example`, using the `00-bootstrap` outputs.
+| Key | Notes |
+|---|---|
+| `aws_profile` | CLI profile with admin in the management account |
+| `org_name`, `unique_id` | Prefix and uniqueness suffix for every generated name |
+| `regions.primary` / `.secondary` | The `restrict-regions` SCP denies everything outside this pair |
+| `github.org` / `.repo` | Who may assume the CI OIDC role |
+| `accounts` | Account → OU. Emails derive from `email_pattern` unless you set one |
+| `alert_email` | Confirm the SNS subscription or alerts go nowhere |
+| `sso_users` | Or delete the block and connect an external IdP |
+| VPC CIDRs | **Not in the YAML** — they live in `layers/05-network/*.tf`. See §4 |
+
+Derived for you, never typed: the state bucket, lock table, and all three log
+bucket names come from `org_name` + `unique_id`. Override under
+`bucket_overrides` only if you must match an existing naming standard.
 
 ---
 
@@ -108,18 +109,22 @@ Strict. Each layer reads the one before it.
             → 04-security → 05-network → 06-identity
 ```
 
-Per layer:
+One shot:
 
 ```bash
-cd layers/<layer>
-cp terraform.tfvars.example terraform.tfvars          # edit
-cp backend.s3.tfbackend.example backend.s3.tfbackend  # edit
-terraform init -backend-config=backend.s3.tfbackend
-terraform plan
-terraform apply
+make deploy          # renders the YAML, then applies 00 → 06 in order
 ```
 
-`00-bootstrap` is the exception — local backend first, then migrate. See its README.
+Or a layer at a time, which is what you want while you are still reading:
+
+```bash
+make plan  LAYER=05-network
+make apply LAYER=05-network
+```
+
+`make deploy` handles the `00-bootstrap` local-backend-then-migrate dance for
+you. Doing it by hand is still documented in `layers/00-bootstrap/README.md` —
+worth reading once even if you never do it manually.
 
 **Account creation is slow.** `01-organization` takes several minutes per account
 and AWS rate-limits it. A timeout mid-run is normal; re-apply and it continues.
@@ -152,4 +157,5 @@ There is no feature flag anywhere in this repo. What you can read is what you ge
 - [ ] Prod egress works end to end (see the trap in `05-network/README.md`)
 - [ ] Log buckets have a lifecycle policy matching your retention requirement
 - [ ] A break-glass path exists for Identity Center being unavailable
-- [ ] `terraform.tfvars` and `*.tfbackend` are gitignored — verify before pushing
+- [ ] `terraform.tfvars.json` and `*.tfbackend` are gitignored — verify before pushing
+- [ ] `configs/landing-zone.yaml` has your real emails in it — decide whether that file belongs in a public repo

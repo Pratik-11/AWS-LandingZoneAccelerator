@@ -30,6 +30,11 @@ jobs:
           terraform_version: 1.9.8
           terraform_wrapper: false
 
+      - name: render config
+        run: |
+          pip install --quiet pyyaml
+          python3 scripts/render.py
+
       - name: terraform fmt
         run: terraform fmt -check -recursive -diff
 

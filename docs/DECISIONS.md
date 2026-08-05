@@ -91,28 +91,35 @@ accounts in one OU need different guardrails, the OU is wrong.
 
 ---
 
-## 6. No feature flags, no persona toggles, no config language
+## 6. YAML supplies values; it does not switch features
 
-**Decision:** no `enable_*` variables, no `landing_zone_type`, no YAML. To remove
-something, delete its module block.
+**Decision:** `configs/landing-zone.yaml` is the single place you put your
+emails, regions, profile and org slug. `scripts/render.py` fans it out into each
+layer's `terraform.tfvars.json` and `backend.s3.tfbackend`. There are no
+`enable_*` flags and no personas.
 
-**Why:** this repo's job is to be *read*. A toggle means the resources you get
-depend on a variable somewhere else, and the reader has to simulate the conditional
-to know what exists. Deleting a visible block is unambiguous.
+**Why the split matters.** A config file that supplies *values* is a
+convenience — you were always going to type an email somewhere, and typing it
+once beats typing it in seven files. A config file that decides *which
+resources exist* is a different thing: it means the reader cannot answer "what
+does this deploy?" from the Terraform alone.
 
-There was a persona toggle here. It gated SCP creation on a name allow-list whose
-strings had drifted from the names actually passed in, so **eight of ten guardrails
-silently failed to deploy** while `terraform apply` reported success. That is the
-characteristic failure of configurable-by-default: it fails quietly. It was
-removed rather than fixed.
+This repo started from a version that had exactly such a toggle. `modules/scp`
+gated policy creation on a name allow-list, the strings in that list drifted
+from the names actually passed in, and 8 of 10 guardrails silently stopped
+being created while `terraform apply` reported success. Nobody would have
+caught it by reading `scps.tf`, because `scps.tf` looked right.
 
-**Alternative:** a real config surface. Right for a product you ship to many
-customers. Wrong for a template someone forks once and owns.
+So: to remove a guardrail you delete its module block in `scps.tf`. To change
+an email you edit the YAML. What exists is readable; what varies is
+configurable.
 
-**Cost:** no single knob to switch environments. Correct — this repo is meant to be
-edited, not configured.
+**Alternative:** put feature switches in the YAML too. It is what most
+accelerators do and it is genuinely more convenient — right up until the first
+silent failure.
 
----
+**Cost:** two places to look instead of one. `docs/ADAPTING.md` says which is
+which.
 
 ## 7. Providers are hand-written, one per account
 
