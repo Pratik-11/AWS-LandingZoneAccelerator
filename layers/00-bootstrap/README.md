@@ -20,10 +20,13 @@ This layer creates the backend that holds state — so on the first run there is
 nowhere to put its own state. That is why `backend.tf` here says `backend "local"`
 while every other layer says `backend "s3" {}`.
 
-Apply locally first, then migrate this layer's state into the bucket it just made:
+`make deploy` does all of this automatically. To do it by hand — worth reading
+once, because it is the part people get wrong — apply locally first, then
+migrate this layer's state into the bucket it just made:
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars   # edit it
+# configs/landing-zone.yaml holds the values; render them out first
+python3 ../../scripts/render.py
 terraform init
 terraform apply
 

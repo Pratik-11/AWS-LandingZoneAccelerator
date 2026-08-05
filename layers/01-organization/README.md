@@ -58,7 +58,7 @@ eleven. One-resource modules are indirection with no payoff.
 The keys in `ou_names` and in the `accounts` map are looked up by exact string,
 here and in four downstream layers (`account_ids["Audit"]`,
 `module.org_units["Security"]`, …). Renaming one is a multi-file change. See
-`terraform.tfvars.example` and `docs/ADAPTING.md`.
+`configs/landing-zone.yaml` and `docs/ADAPTING.md`.
 
 ## Outputs
 
