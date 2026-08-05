@@ -1,0 +1,121 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# The whole landing zone, in one file.
+#
+#   cp configs/landing-zone.yaml configs/my-lz.yaml   # optional
+#   make deploy                                       # one shot, layers 00 → 06
+#
+# scripts/render.py fans this out into each layer's terraform.tfvars.json and
+# backend.s3.tfbackend. You never write a value twice.
+#
+# This file supplies VALUES ONLY — emails, regions, names. It has no enable/
+# disable switches. What the landing zone contains is whatever you can read in
+# layers/*/; to drop something you delete its block there. That rule exists
+# because the version of this repo we started from had exactly such a toggle,
+# and a drifted string in it silently removed 8 of 10 security guardrails while
+# reporting success. See docs/DECISIONS.md §6.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Identity ──────────────────────────────────────────────────────────────────
+
+# Short slug for your org. Prefixes every generated resource name.
+org_name: acme
+
+# S3 bucket names are globally unique across all of AWS, so a bare
+# "acme-lz-terraform-state" will collide with someone. Last 4 of your
+# management account ID works well.
+unique_id: a1b2
+
+# AWS CLI profile with administrator access in the MANAGEMENT (payer) account.
+# Every layer assumes roles outward from here.
+aws_profile: my-management-profile
+
+# ── Regions ───────────────────────────────────────────────────────────────────
+# primary is where everything is built. secondary is currently only used by the
+# restrict-regions SCP and the one second-region Config recorder — the rest of
+# the repo is deliberately single-region (see layers/05-network/README.md).
+regions:
+  primary: us-east-1
+  secondary: ap-south-1
+
+# ── CI ────────────────────────────────────────────────────────────────────────
+# Which GitHub repo may assume the OIDC role that 00-bootstrap creates.
+# repo: "*" allows every repo in the org.
+github:
+  org: my-github-org
+  repo: aws-landing-zone
+
+# ── Organization ──────────────────────────────────────────────────────────────
+
+# ⚠️ Load-bearing. scps.tf looks these up by exact string. Renaming one means
+# editing layers/01-organization/scps.tf to match.
+ou_names:
+  - Security
+  - Infrastructure
+  - Sandbox
+  - Workloads
+
+# Account emails are derived from this pattern — {account} becomes the
+# lowercased account name below. Set an explicit `email:` on any account to
+# override. Every address must be globally unique across AWS and must not
+# already belong to an account; plus-addressing works with Google Workspace
+# and Microsoft 365.
+#
+# AWS cannot delete accounts through the API. Creating these is effectively
+# one-way, so get the addresses right the first time.
+email_pattern: "aws+{account}@example.com"
+
+# ⚠️ Also load-bearing. Layers 03–06 index this map by exact string
+# (account_ids["Audit"], account_ids["LogArchive"], …). Adding an account is
+# safe; renaming one is a repo-wide change. See docs/ADAPTING.md §3.
+accounts:
+  Audit: { ou: Security }
+  LogArchive: { ou: Security }
+  Network: { ou: Infrastructure }
+  SharedServices: { ou: Infrastructure }
+  Dev: { ou: Workloads }
+  Prod: { ou: Workloads }
+  Sandbox: { ou: Sandbox }
+
+# ── Security ──────────────────────────────────────────────────────────────────
+# AWS emails a confirmation link here and the SNS subscription stays pending —
+# silently delivering nothing — until someone clicks it. Prefer a list over an
+# individual.
+alert_email: security-alerts@example.com
+
+# ── Identity Center ───────────────────────────────────────────────────────────
+# ⚠️ IAM Identity Center must be enabled in the console first. It is a per-org
+# singleton Terraform cannot create; layer 06 reads it as a data source and
+# fails with an unhelpful index error if it is missing.
+#
+# groups must be one of: platform_engineers, developers, security_team, finance
+# (defined in layers/06-identity/groups.tf). Who gets what is in assignments.tf.
+#
+# The built-in directory is fine for a small team. For anything real, connect an
+# external IdP over SCIM and delete this block.
+sso_users:
+  jane.doe:
+    display_name: Jane Doe
+    given_name: Jane
+    family_name: Doe
+    email: jane.doe@example.com
+    groups: [platform_engineers]
+  john.smith:
+    display_name: John Smith
+    given_name: John
+    family_name: Smith
+    email: john.smith@example.com
+    groups: [developers]
+
+# ── Derived, not configured ───────────────────────────────────────────────────
+# These are computed by scripts/render.py from org_name + unique_id, so they
+# stay consistent and you never retype them:
+#
+#   state bucket      {org_name}-lz-terraform-state-{unique_id}
+#   lock table        {org_name}-lz-terraform-locks-{unique_id}
+#   cloudtrail bucket {org_name}-lz-cloudtrail-logs-{unique_id}
+#   config bucket     {org_name}-lz-config-logs-{unique_id}
+#   flow logs bucket  {org_name}-lz-flow-logs-{unique_id}
+#
+# Override any of them here if you must match an existing naming standard:
+# bucket_overrides:
+#   cloudtrail: my-existing-trail-bucket
